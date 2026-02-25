@@ -758,29 +758,30 @@ client.on(Events.MessageCreate, async (message) => {
   if (message.author.bot) return;
   if (!isTicketChannel(message.channel)) return;
 
-  if (AUTO_REPLY_EXCLUDED_USER_IDS.has(message.author.id)) {
-    const testContent = message.content.trim();
-    if (testContent.toLowerCase().startsWith(SUPPORT_TEST_PREFIX)) {
-      const simulatedUserMessage = testContent.slice(SUPPORT_TEST_PREFIX.length).trim();
-      if (!simulatedUserMessage) return;
-
-      const simulatedReply = getRuleBasedReply(simulatedUserMessage);
-      if (simulatedReply) {
-        await sendAutoReply(message, `[Support Test]\n${simulatedReply}`);
+  const rawContent = message.content.trim();
+  if (rawContent.toLowerCase().startsWith(SUPPORT_TEST_PREFIX)) {
+    const canTest =
+      AUTO_REPLY_EXCLUDED_USER_IDS.has(message.author.id) ||
+      message.member?.permissions.has(PermissionFlagsBits.ManageChannels);
+    if (canTest) {
+      const simulatedUserMessage = rawContent.slice(SUPPORT_TEST_PREFIX.length).trim();
+      if (simulatedUserMessage) {
+        const simulatedReply = getRuleBasedReply(simulatedUserMessage);
+        if (simulatedReply) {
+          await sendAutoReply(message, `[Support Test]\n${simulatedReply}`);
+        } else {
+          await sendAutoReply(message, '[Support Test]\n(No rule matched — bot would use AI fallback or stay silent)');
+        }
       }
-      return;
-    }
-
-    // Support staff messages are ignored in production; handoff starts only after at least one bot reply exists.
-    try {
-      const recent = await message.channel.messages.fetch({ limit: 30 });
-    MANUAL_HANDOFF_CHANNEL_IDS.add(message.channel.id);
-      debugLog('manual handoff enabled for channel', message.channel.id, 'by', message.author.id);
-    } catch {
-      // ignore fetch errors; still ignore support messages
     }
     return;
   }
+
+  if (AUTO_REPLY_EXCLUDED_USER_IDS.has(message.author.id)) {
+    MANUAL_HANDOFF_CHANNEL_IDS.add(message.channel.id);
+    return;
+  }
+
 
   if (MANUAL_HANDOFF_CHANNEL_IDS.has(message.channel.id)) {
     debugLog('manual handoff active, skip channel', message.channel.id);
