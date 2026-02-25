@@ -398,8 +398,8 @@ function getRuleBasedReply(content) {
   }
 
   const isWalletConnectionIssue =
-    includesAny(text, ['wallet', 'connection', 'connect', 'external wallet', 'eoa wallet', 'metamask', 'rabby']) &&
-    includesAny(text, ['fail', 'failed', 'error', 'issue', 'problem', "can't", 'cant', 'cannot', 'not work', 'not working', 'wrong']);
+    includesAny(text, ['wallet', 'connection', 'connect', 'external wallet', 'eoa wallet', 'metamask', 'rabby', 'okx', 'keplr']) &&
+    includesAny(text, ['fail', 'failed', 'error', 'issue', 'problem', "can't", 'cant', 'cannot', 'not work', 'not working', 'wrong', 'unable']);
 
   if (isWalletConnectionIssue) {
     return withGreeting(pickRandom(WALLET_FIXING_VARIANTS));
@@ -773,6 +773,23 @@ client.on(Events.MessageCreate, async (message) => {
           await sendAutoReply(message, '[Support Test]\n(No rule matched — bot would use AI fallback or stay silent)');
         }
       }
+    }
+    return;
+  }
+
+  if (AUTO_REPLY_EXCLUDED_USER_IDS.has(message.author.id)) {
+    // Support staff messages are ignored in production; handoff starts only after at least one bot reply exists.
+    try {
+      const recent = await message.channel.messages.fetch({ limit: 30 });
+      const hasPriorBotReply = recent.some((m) => m.author.id === client.user.id);
+      if (hasPriorBotReply) {
+        MANUAL_HANDOFF_CHANNEL_IDS.add(message.channel.id);
+        debugLog('manual handoff enabled for channel', message.channel.id, 'by', message.author.id);
+      } else {
+        debugLog('excluded support message ignored before bot reply', message.author.id);
+      }
+    } catch {
+      // ignore fetch errors; still ignore support messages
     }
     return;
   }
