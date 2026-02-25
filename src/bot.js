@@ -25,7 +25,8 @@ const {
   OPENAI_API_KEY = '',
   OPENAI_MODEL = 'gpt-4.1-mini',
   SCORE_PORTAL_URL = 'https://portal.soneium.org/en/profile/YOUR_WALLET_ADDRESS',
-  ROLE_TAG_ESCALATION_MENTIONS = '@Alicia @Ramz @Jerad'
+  ROLE_TAG_ESCALATION_MENTIONS = '@Alicia @Ramz @Jerad',
+  DEBUG_AUTOREPLY = 'false'
 } = process.env;
 
 if (!DISCORD_TOKEN) {
@@ -45,6 +46,7 @@ if (
 
 const cooldownMs = Number(AUTO_REPLY_COOLDOWN_SEC) * 1000;
 const aiEnabled = AI_ENABLED.toLowerCase() === 'true';
+const debugAutoReply = DEBUG_AUTOREPLY.toLowerCase() === 'true';
 const hasUsableOpenAIKey = OPENAI_API_KEY && !/여기에|token|key|토큰/i.test(OPENAI_API_KEY) && OPENAI_API_KEY.length > 20;
 let aiKeyWarningShown = false;
 const lastReplyByChannelUser = new Map();
@@ -56,7 +58,6 @@ const OPEN_TICKET_MODAL_ID = 'open_ticket_modal';
 const SMART_WALLET_INPUT_ID = 'smart_wallet_address';
 const EOA_WALLET_INPUT_ID = 'eoa_wallet_address';
 const AUTO_REPLY_EXCLUDED_USER_IDS = new Set([
-  '516260929093107729',
   '747167440945020978'
 ]);
 const MANUAL_HANDOFF_CHANNEL_IDS = new Set();
@@ -215,6 +216,10 @@ function pickRandom(items) {
 
 function withGreeting(reply) {
   return `${FIXING_GREETING}\n${reply}`;
+}
+
+function debugLog(...args) {
+  if (debugAutoReply) console.log('[auto-reply]', ...args);
 }
 
 async function sendAutoReply(message, content) {
@@ -752,12 +757,26 @@ client.on(Events.MessageCreate, async (message) => {
   if (!isTicketChannel(message.channel)) return;
 
   if (AUTO_REPLY_EXCLUDED_USER_IDS.has(message.author.id)) {
-    // If support staff replies in this ticket, stop bot auto-replies in this channel.
-    MANUAL_HANDOFF_CHANNEL_IDS.add(message.channel.id);
+    // Support staff messages are ignored; handoff starts only after at least one bot reply exists.
+    try {
+      const recent = await message.channel.messages.fetch({ limit: 30 });
+      const hasPriorBotReply = recent.some((m) => m.author.id === client.user.id);
+      if (hasPriorBotReply) {
+        MANUAL_HANDOFF_CHANNEL_IDS.add(message.channel.id);
+        debugLog('manual handoff enabled for channel', message.channel.id, 'by', message.author.id);
+      } else {
+        debugLog('excluded support message ignored before bot reply', message.author.id);
+      }
+    } catch {
+      // ignore fetch errors; still ignore support messages
+    }
     return;
   }
 
-  if (MANUAL_HANDOFF_CHANNEL_IDS.has(message.channel.id)) return;
+  if (MANUAL_HANDOFF_CHANNEL_IDS.has(message.channel.id)) {
+    debugLog('manual handoff active, skip channel', message.channel.id);
+    return;
+  }
   if (message.mentions.roles.size > 0 || message.mentions.everyone) {
     await sendAutoReply(message, ROLE_TAG_ESCALATION_MENTIONS);
     return;
@@ -770,9 +789,11 @@ client.on(Events.MessageCreate, async (message) => {
   try {
     const ruleBasedReply = getRuleBasedReply(message.content);
     if (ruleBasedReply) {
+      debugLog('rule matched for channel', message.channel.id, 'user', message.author.id);
       await sendAutoReply(message, ruleBasedReply);
       return;
     }
+    debugLog('no rule matched for content:', message.content);
     return;
   } catch (error) {
     console.error('자동응답 전송 실패:', error);
