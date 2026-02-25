@@ -398,8 +398,8 @@ function getRuleBasedReply(content) {
   }
 
   const isWalletConnectionIssue =
-    includesAny(text, ['wallet', 'connection', 'connect', 'external wallet', 'eoa wallet', 'metamask', 'rabby']) &&
-    includesAny(text, ['fail', 'failed', 'error', 'issue', 'problem', "can't", 'cant', 'cannot', 'not work', 'not working', 'wrong']);
+    includesAny(text, ['wallet', 'connection', 'connect', 'external wallet', 'eoa wallet', 'metamask', 'rabby', 'okx', 'keplr']) &&
+    includesAny(text, ['fail', 'failed', 'error', 'issue', 'problem', "can't", 'cant', 'cannot', 'not work', 'not working', 'wrong', 'unable']);
 
   if (isWalletConnectionIssue) {
     return withGreeting(pickRandom(WALLET_FIXING_VARIANTS));
