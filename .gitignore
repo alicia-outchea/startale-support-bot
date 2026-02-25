@@ -1,0 +1,6 @@
+.env
+node_modules
+.DISCORD_TOKEN*.save
+.cd.save
+.DISCORD_TOKEN*.save
+.cd.save
