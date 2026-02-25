@@ -58,9 +58,11 @@ const OPEN_TICKET_MODAL_ID = 'open_ticket_modal';
 const SMART_WALLET_INPUT_ID = 'smart_wallet_address';
 const EOA_WALLET_INPUT_ID = 'eoa_wallet_address';
 const AUTO_REPLY_EXCLUDED_USER_IDS = new Set([
+  '516260929093107729',
   '747167440945020978'
 ]);
 const MANUAL_HANDOFF_CHANNEL_IDS = new Set();
+const SUPPORT_TEST_PREFIX = '!test ';
 const FIXING_GREETING = 'Hello, thank you for the report!';
 const GENERAL_FIXING_VARIANTS = [
   'Our team is aware of this and is actively working on a fix right now. Thank you for your patience while we resolve it. 🙏',
@@ -757,7 +759,19 @@ client.on(Events.MessageCreate, async (message) => {
   if (!isTicketChannel(message.channel)) return;
 
   if (AUTO_REPLY_EXCLUDED_USER_IDS.has(message.author.id)) {
-    // Support staff messages are ignored; handoff starts only after at least one bot reply exists.
+    const testContent = message.content.trim();
+    if (testContent.toLowerCase().startsWith(SUPPORT_TEST_PREFIX)) {
+      const simulatedUserMessage = testContent.slice(SUPPORT_TEST_PREFIX.length).trim();
+      if (!simulatedUserMessage) return;
+
+      const simulatedReply = getRuleBasedReply(simulatedUserMessage);
+      if (simulatedReply) {
+        await sendAutoReply(message, `[Support Test]\n${simulatedReply}`);
+      }
+      return;
+    }
+
+    // Support staff messages are ignored in production; handoff starts only after at least one bot reply exists.
     try {
       const recent = await message.channel.messages.fetch({ limit: 30 });
       const hasPriorBotReply = recent.some((m) => m.author.id === client.user.id);
