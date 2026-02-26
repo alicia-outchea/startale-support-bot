@@ -59,7 +59,8 @@ const SMART_WALLET_INPUT_ID = 'smart_wallet_address';
 const EOA_WALLET_INPUT_ID = 'eoa_wallet_address';
 const AUTO_REPLY_EXCLUDED_USER_IDS = new Set([
   '516260929093107729',
-  '747167440945020978'
+  '747167440945020978',
+  '1097847998647636029'
 ]);
 const MANUAL_HANDOFF_CHANNEL_IDS = new Set();
 const SUPPORT_TEST_PREFIX = '!test ';
@@ -70,9 +71,9 @@ const GENERAL_FIXING_VARIANTS = [
   'We understand this is frustrating, and we truly appreciate your patience. The team is actively working on a resolution now. 🙏'
 ];
 const GM_FIXING_VARIANTS = [
-  'Our team has identified the GM/gasless action issue and is actively working on it now. Thank you for your patience, and we will update you as soon as it is fixed. 🙏',
-  'Thanks for flagging the GM issue. The team is currently working on a fix, and we expect improvement soon. We appreciate your patience. 🙏',
-  'We have shared your GM report with the developers, and they are actively fixing it. Thank you for waiting with us. 🙏'
+  "We've just rolled out a test deployment and are currently testing with a small group. The fix is coming very soon — please hang tight just a little longer! 🙏",
+  "A test build is now live and we're validating it with a small group. It'll be fully fixed very soon — thank you for your patience just a bit longer! 🙏",
+  "We've deployed a test fix and are actively testing it with a small group right now. It should be resolved very soon — just a little more patience, thank you! 🙏"
 ];
 const WALLET_FIXING_VARIANTS = [
   'Our team is aware of the wallet connection issue and is actively working on a fix. Thank you for your patience while we resolve this. 🙏',
@@ -243,7 +244,7 @@ function getRuleBasedReply(content) {
   const isGMIssue =
     (
       includesAny(text, ['gm', 'gasless action', 'gasless']) &&
-      includesAny(text, ["can't", 'cant', 'cannot', 'not working', 'does not work', 'not work', 'fail', 'failed', 'error', 'issue', 'problem'])
+      includesAny(text, ["can't", 'cant', 'cannot', 'not working', 'does not work', "doesn't work", 'doesnt work', 'not work', 'fail', 'failed', 'error', 'issue', 'problem'])
     ) ||
     includesAny(text, [
       'can’t send gm',
