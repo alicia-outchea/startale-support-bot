@@ -657,6 +657,7 @@ client.once(Events.ClientReady, async () => {
     if (hasValidGuildId) {
       const guild = await client.guilds.fetch(GUILD_ID);
       await guild.commands.set(commands);
+      await client.application.commands.set([]);
       console.log(`길드 전용 슬래시 명령어 등록 완료: /${PANEL_COMMAND_NAME}`);
     } else {
       if (GUILD_ID) {
