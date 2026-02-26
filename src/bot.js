@@ -10,6 +10,8 @@ import {
   GatewayIntentBits,
   ModalBuilder,
   PermissionFlagsBits,
+  StringSelectMenuBuilder,
+  StringSelectMenuOptionBuilder,
   TextInputBuilder,
   TextInputStyle
 } from 'discord.js';
@@ -54,6 +56,65 @@ const OPEN_TICKET_BUTTON_ID = 'open_ticket';
 const CLOSE_TICKET_BUTTON_ID = 'close_ticket';
 const PANEL_COMMAND_NAME = 'ticketpanel';
 const DELETE_AUTO_REPLY_COMMAND_NAME = 'deletebotreply';
+const FAQ_COMMAND_NAME = 'faq';
+const FAQ_SELECT_MENU_ID = 'faq_select';
+const FAQ_ITEMS = [
+  {
+    id: 'faq_1',
+    question: 'How can I earn STAR Points?',
+    answer: 'You can earn STAR Points by providing liquidity and by reaching 10 daily GMs.'
+  },
+  {
+    id: 'faq_2',
+    question: 'How many STAR Points can I earn for providing liquidity?',
+    answer: 'You earn 1 STAR Point per day for every $100 worth of liquidity provided.'
+  },
+  {
+    id: 'faq_3',
+    question: 'What is the minimum liquidity required to earn STAR Points?',
+    answer: 'The minimum required is $50, which earns 0.5 STAR Points per day.'
+  },
+  {
+    id: 'faq_4',
+    question: 'What happens if I remove liquidity before 30 days?',
+    answer: 'Liquidity withdrawn before 30 days does not earn any STAR Points.'
+  },
+  {
+    id: 'faq_5',
+    question: 'Is there a difference between the Earn Vault and providing liquidity?',
+    answer: 'Yes.\n• **Earn Vault** deposits earn an APY paid in USDC.\n• **Providing liquidity** (minimum $50) earns STAR Points.'
+  },
+  {
+    id: 'faq_6',
+    question: 'How does APY work in the Earn Vault?',
+    answer: 'APY is dynamic. As more users deposit into the Earn Vault, the APY decreases; as participation declines, the APY increases.'
+  },
+  {
+    id: 'faq_7',
+    question: 'When do STAR Points appear on my profile?',
+    answer: 'STAR Points appear after 30 days from the point you provided a minimum of $50 worth in liquidity.'
+  },
+  {
+    id: 'faq_8',
+    question: 'What if the Startale USD price fluctuates after I deposit?',
+    answer: 'STAR Points are calculated based on the USD value at the time of deposit. Minor price fluctuations after deposit do not reduce earned points.'
+  },
+  {
+    id: 'faq_9',
+    question: 'How are STAR Points calculated for multiple deposits?',
+    answer: 'Each deposit is tracked independently.\n• A $50 deposit on January 1 earns 0.5 STAR Points after 30 days.\n• A $100 deposit on January 5 earns 1 STAR Point after its own 30-day period.'
+  },
+  {
+    id: 'faq_10',
+    question: 'Can I choose which liquidity position to withdraw?',
+    answer: 'No. Withdrawals follow a Last-In, First-Out (LIFO) method. This helps preserve older positions that may carry higher multipliers.'
+  },
+  {
+    id: 'faq_11',
+    question: 'Are transactions before the monthly mission counted retroactively?',
+    answer: 'No. Transactions are not retroactively applied in order to ensure fairness for all participants.\n\nFor more information, please refer to the Startale USDSC FAQ.'
+  }
+];
 const OPEN_TICKET_MODAL_ID = 'open_ticket_modal';
 const SMART_WALLET_INPUT_ID = 'smart_wallet_address';
 const EOA_WALLET_INPUT_ID = 'eoa_wallet_address';
@@ -584,6 +645,10 @@ client.once(Events.ClientReady, async () => {
     {
       name: DELETE_AUTO_REPLY_COMMAND_NAME,
       description: 'Delete the latest bot auto-reply in this ticket channel.'
+    },
+    {
+      name: FAQ_COMMAND_NAME,
+      description: 'Browse frequently asked questions about the Startale App.'
     }
   ];
 
@@ -630,6 +695,28 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
       await latestBotReply.delete();
       await interaction.reply({ content: 'Deleted the latest bot auto-reply.', ephemeral: true });
+      return;
+    }
+
+    if (interaction.commandName === FAQ_COMMAND_NAME) {
+      const selectMenu = new StringSelectMenuBuilder()
+        .setCustomId(FAQ_SELECT_MENU_ID)
+        .setPlaceholder('Select a question...')
+        .addOptions(
+          FAQ_ITEMS.map((item) =>
+            new StringSelectMenuOptionBuilder()
+              .setLabel(item.question)
+              .setValue(item.id)
+          )
+        );
+
+      const row = new ActionRowBuilder().addComponents(selectMenu);
+
+      await interaction.reply({
+        content: '**Frequently Asked Questions**\nSelect a question below to see the answer:',
+        components: [row],
+        ephemeral: true
+      });
       return;
     }
 
@@ -727,6 +814,21 @@ client.on(Events.InteractionCreate, async (interaction) => {
       console.error('티켓 채널 생성 실패:', error);
       await interaction.reply({ content: 'An error occurred while creating your ticket.', ephemeral: true });
     }
+    return;
+  }
+
+  if (interaction.isStringSelectMenu() && interaction.inGuild() && interaction.customId === FAQ_SELECT_MENU_ID) {
+    const selectedId = interaction.values[0];
+    const faqItem = FAQ_ITEMS.find((item) => item.id === selectedId);
+
+    if (!faqItem) {
+      await interaction.reply({ content: 'Question not found.', ephemeral: true });
+      return;
+    }
+
+    await interaction.reply({
+      content: `**Q: ${faqItem.question}**\n\n${faqItem.answer}`
+    });
     return;
   }
 
