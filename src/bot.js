@@ -292,20 +292,20 @@ function getRuleBasedReply(content) {
 
   const isGMIssue =
     (
-      includesAny(text, ['gm', 'gasless action', 'gasless']) &&
-      includesAny(text, ["can't", 'cant', 'cannot', 'not working', 'does not work', "doesn't work", 'doesnt work', 'not work', 'fail', 'failed', 'error', 'issue', 'problem'])
+      (includesWord(text, ‘gm’) || includesAny(text, [‘gasless action’, ‘gasless’])) &&
+      includesAny(text, ["can’t", ‘cant’, ‘cannot’, ‘not working’, ‘does not work’, "doesn’t work", ‘doesnt work’, ‘not work’, ‘fail’, ‘failed’, ‘error’, ‘issue’, ‘problem’])
     ) ||
     includesAny(text, [
-      'can’t send gm',
-      "can't send gm",
-      'cannot gm',
-      'gm not working',
-      'try gasless action does not work',
-      'try gasless action not work',
-      'send gm back',
-      'send gm back function'
+      ‘can’t send gm’,
+      "can’t send gm",
+      ‘cannot gm’,
+      ‘gm not working’,
+      ‘try gasless action does not work’,
+      ‘try gasless action not work’,
+      ‘send gm back’,
+      ‘send gm back function’
     ]) ||
-    (/gm/.test(text) && /(startale site|startale)/.test(text) && /(does not work|not work|not working)/.test(text));
+    (includesWord(text, ‘gm’) && /(startale site|startale)/.test(text) && /(does not work|not work|not working)/.test(text));
 
   if (isGMIssue) {
     return withGreeting(pickRandom(GM_FIXING_VARIANTS));
