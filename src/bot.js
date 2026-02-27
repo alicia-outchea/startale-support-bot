@@ -28,7 +28,8 @@ const {
   OPENAI_MODEL = 'gpt-4.1-mini',
   SCORE_PORTAL_URL = 'https://portal.soneium.org/en/profile/YOUR_WALLET_ADDRESS',
   ROLE_TAG_ESCALATION_MENTIONS = '@Alicia @Ramz @Jerad',
-  DEBUG_AUTOREPLY = 'false'
+  DEBUG_AUTOREPLY = 'false',
+  SUPPORT_STAFF_IDS = ''
 } = process.env;
 
 if (!DISCORD_TOKEN) {
@@ -118,11 +119,11 @@ const FAQ_ITEMS = [
 const OPEN_TICKET_MODAL_ID = 'open_ticket_modal';
 const SMART_WALLET_INPUT_ID = 'smart_wallet_address';
 const EOA_WALLET_INPUT_ID = 'eoa_wallet_address';
-const AUTO_REPLY_EXCLUDED_USER_IDS = new Set([
-  '516260929093107729',
-  '747167440945020978',
-  '1097847998647636029'
-]);
+const AUTO_REPLY_EXCLUDED_USER_IDS = new Set(
+  SUPPORT_STAFF_IDS
+    ? SUPPORT_STAFF_IDS.split(',').map(id => id.trim()).filter(Boolean)
+    : []
+);
 const MANUAL_HANDOFF_CHANNEL_IDS = new Set();
 const SUPPORT_TEST_PREFIX = '!test ';
 const FIXING_GREETING = 'Hello, thank you for the report!';
