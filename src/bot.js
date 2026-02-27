@@ -692,7 +692,23 @@ client.on(Events.MessageCreate, async (message) => {
 
 
   if (MANUAL_HANDOFF_CHANNEL_IDS.has(message.channel.id)) {
-    debugLog('manual handoff active, skip channel', message.channel.id);
+    debugLog('manual handoff active (cached), skip channel', message.channel.id);
+    return;
+  }
+
+  // Check Discord history in case bot restarted and lost in-memory state.
+  // If any support staff member has sent a message in this channel, treat as handoff.
+  try {
+    const recent = await message.channel.messages.fetch({ limit: 30 });
+    const hasStaffReply = recent.some((m) => AUTO_REPLY_EXCLUDED_USER_IDS.has(m.author.id));
+    if (hasStaffReply) {
+      MANUAL_HANDOFF_CHANNEL_IDS.add(message.channel.id);
+      debugLog('manual handoff detected from history, skip channel', message.channel.id);
+      return;
+    }
+  } catch {
+    // If we can't fetch history, skip auto-reply to be safe
+    debugLog('failed to fetch history for handoff check, skipping channel', message.channel.id);
     return;
   }
   if (message.mentions.roles.size > 0 || message.mentions.everyone) {
