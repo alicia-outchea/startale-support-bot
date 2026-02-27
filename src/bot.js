@@ -168,7 +168,7 @@ const STILL_FIXING_VARIANTS = [
   'We sincerely apologize for the delay. The issue is still under active investigation and fixing. We will keep you posted with updates.'
 ];
 const SCORE_REPLY_VARIANTS = [
-  'We’re actively fixing the issue, please rest assured that score tracking is unaffected, all EOA activity and eligible actions across the Startale and Soneium ecosystem continue to count, and the Startale App Bonus will be reflected shortly.',
+  "We're actively fixing the issue, please rest assured that score tracking is unaffected, all EOA activity and eligible actions across the Startale and Soneium ecosystem continue to count, and the Startale App Bonus will be reflected shortly.",
   'Our team is actively fixing this issue. Please rest assured that score tracking is unaffected, all EOA activity and eligible actions across the Startale and Soneium ecosystem still count, and the Startale App Bonus will be reflected shortly.',
   'We are currently working on this issue. Please rest assured that score tracking remains unaffected, all EOA activity and eligible actions across Startale and the Soneium ecosystem continue to count, and the Startale App Bonus will be reflected shortly.'
 ];
@@ -292,20 +292,19 @@ function getRuleBasedReply(content) {
 
   const isGMIssue =
     (
-      (includesWord(text, ‘gm’) || includesAny(text, [‘gasless action’, ‘gasless’])) &&
-      includesAny(text, ["can’t", ‘cant’, ‘cannot’, ‘not working’, ‘does not work’, "doesn’t work", ‘doesnt work’, ‘not work’, ‘fail’, ‘failed’, ‘error’, ‘issue’, ‘problem’])
+      (includesWord(text, 'gm') || includesAny(text, ['gasless action', 'gasless'])) &&
+      includesAny(text, ["can't", 'cant', 'cannot', 'not working', 'does not work', "doesn't work", 'doesnt work', 'not work', 'fail', 'failed', 'error', 'issue', 'problem'])
     ) ||
     includesAny(text, [
-      ‘can’t send gm’,
-      "can’t send gm",
-      ‘cannot gm’,
-      ‘gm not working’,
-      ‘try gasless action does not work’,
-      ‘try gasless action not work’,
-      ‘send gm back’,
-      ‘send gm back function’
+      "can't send gm",
+      'cannot gm',
+      'gm not working',
+      'try gasless action does not work',
+      'try gasless action not work',
+      'send gm back',
+      'send gm back function'
     ]) ||
-    (includesWord(text, ‘gm’) && /(startale site|startale)/.test(text) && /(does not work|not work|not working)/.test(text));
+    (includesWord(text, 'gm') && /(startale site|startale)/.test(text) && /(does not work|not work|not working)/.test(text));
 
   if (isGMIssue) {
     return withGreeting(pickRandom(GM_FIXING_VARIANTS));
@@ -686,24 +685,8 @@ client.on(Events.MessageCreate, async (message) => {
   }
 
   if (AUTO_REPLY_EXCLUDED_USER_IDS.has(message.author.id)) {
-    // Support staff messages are ignored in production; handoff starts only after at least one bot reply exists.
-    try {
-      const recent = await message.channel.messages.fetch({ limit: 30 });
-      const hasPriorBotReply = recent.some((m) => m.author.id === client.user.id);
-      if (hasPriorBotReply) {
-        MANUAL_HANDOFF_CHANNEL_IDS.add(message.channel.id);
-        debugLog('manual handoff enabled for channel', message.channel.id, 'by', message.author.id);
-      } else {
-        debugLog('excluded support message ignored before bot reply', message.author.id);
-      }
-    } catch {
-      // ignore fetch errors; still ignore support messages
-    }
-    return;
-  }
-
-  if (AUTO_REPLY_EXCLUDED_USER_IDS.has(message.author.id)) {
     MANUAL_HANDOFF_CHANNEL_IDS.add(message.channel.id);
+    debugLog('manual handoff enabled for channel', message.channel.id, 'by', message.author.id);
     return;
   }
 
