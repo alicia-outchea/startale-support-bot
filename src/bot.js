@@ -685,24 +685,8 @@ client.on(Events.MessageCreate, async (message) => {
   }
 
   if (AUTO_REPLY_EXCLUDED_USER_IDS.has(message.author.id)) {
-    // Support staff messages are ignored in production; handoff starts only after at least one bot reply exists.
-    try {
-      const recent = await message.channel.messages.fetch({ limit: 30 });
-      const hasPriorBotReply = recent.some((m) => m.author.id === client.user.id);
-      if (hasPriorBotReply) {
-        MANUAL_HANDOFF_CHANNEL_IDS.add(message.channel.id);
-        debugLog('manual handoff enabled for channel', message.channel.id, 'by', message.author.id);
-      } else {
-        debugLog('excluded support message ignored before bot reply', message.author.id);
-      }
-    } catch {
-      // ignore fetch errors; still ignore support messages
-    }
-    return;
-  }
-
-  if (AUTO_REPLY_EXCLUDED_USER_IDS.has(message.author.id)) {
     MANUAL_HANDOFF_CHANNEL_IDS.add(message.channel.id);
+    debugLog('manual handoff enabled for channel', message.channel.id, 'by', message.author.id);
     return;
   }
 
