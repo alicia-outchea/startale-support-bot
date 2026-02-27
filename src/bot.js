@@ -168,7 +168,7 @@ const STILL_FIXING_VARIANTS = [
   'We sincerely apologize for the delay. The issue is still under active investigation and fixing. We will keep you posted with updates.'
 ];
 const SCORE_REPLY_VARIANTS = [
-  'We’re actively fixing the issue, please rest assured that score tracking is unaffected, all EOA activity and eligible actions across the Startale and Soneium ecosystem continue to count, and the Startale App Bonus will be reflected shortly.',
+  "We're actively fixing the issue, please rest assured that score tracking is unaffected, all EOA activity and eligible actions across the Startale and Soneium ecosystem continue to count, and the Startale App Bonus will be reflected shortly.",
   'Our team is actively fixing this issue. Please rest assured that score tracking is unaffected, all EOA activity and eligible actions across the Startale and Soneium ecosystem still count, and the Startale App Bonus will be reflected shortly.',
   'We are currently working on this issue. Please rest assured that score tracking remains unaffected, all EOA activity and eligible actions across Startale and the Soneium ecosystem continue to count, and the Startale App Bonus will be reflected shortly.'
 ];
@@ -292,20 +292,19 @@ function getRuleBasedReply(content) {
 
   const isGMIssue =
     (
-      (includesWord(text, ‘gm’) || includesAny(text, [‘gasless action’, ‘gasless’])) &&
-      includesAny(text, ["can’t", ‘cant’, ‘cannot’, ‘not working’, ‘does not work’, "doesn’t work", ‘doesnt work’, ‘not work’, ‘fail’, ‘failed’, ‘error’, ‘issue’, ‘problem’])
+      (includesWord(text, 'gm') || includesAny(text, ['gasless action', 'gasless'])) &&
+      includesAny(text, ["can't", 'cant', 'cannot', 'not working', 'does not work', "doesn't work", 'doesnt work', 'not work', 'fail', 'failed', 'error', 'issue', 'problem'])
     ) ||
     includesAny(text, [
-      ‘can’t send gm’,
-      "can’t send gm",
-      ‘cannot gm’,
-      ‘gm not working’,
-      ‘try gasless action does not work’,
-      ‘try gasless action not work’,
-      ‘send gm back’,
-      ‘send gm back function’
+      "can't send gm",
+      'cannot gm',
+      'gm not working',
+      'try gasless action does not work',
+      'try gasless action not work',
+      'send gm back',
+      'send gm back function'
     ]) ||
-    (includesWord(text, ‘gm’) && /(startale site|startale)/.test(text) && /(does not work|not work|not working)/.test(text));
+    (includesWord(text, 'gm') && /(startale site|startale)/.test(text) && /(does not work|not work|not working)/.test(text));
 
   if (isGMIssue) {
     return withGreeting(pickRandom(GM_FIXING_VARIANTS));
