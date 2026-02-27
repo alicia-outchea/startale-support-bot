@@ -130,13 +130,13 @@ const WALLET_FIXING_VARIANTS = [
   'We understand the wallet connection issue is blocking your access. Our team is working on it now and will share updates as soon as possible.'
 ];
 const MIGRATION_FIXING_VARIANTS = [
-  'Most migration/account upgrade cases related to smart wallet (AA) are now resolved. Please try again, and if the issue continues, share your wallet address and screenshots so we can check further. 🙏',
-  'We have resolved the majority of migration issues for smart wallet (AA) users. Please retry the flow once, and let us know if you still see an error. 🙏',
-  'Migration has been improved for most AA/smart wallet users. If you are still blocked, please share details and we will help you right away. 🙏'
+  'Our team is aware of the migration/account upgrade issue and is actively working on a fix. Thank you for your patience while we resolve this. 🙏',
+  'Thank you for reporting this. Our developers are currently working on the migration issue and we will keep you updated. 🙏',
+  'We understand the migration issue is blocking your access. Our team is working on it now and will share updates as soon as possible. 🙏'
 ];
 const AA_MIGRATION_RESOLVED_VARIANTS = [
-  'Good news: migration issues for smart wallet (AA) users are mostly resolved now. Please try again and let us know if you still face any problem. 🙏',
-  'Thanks for checking. The AA/smart wallet migration issue has been fixed for most users. Please retry once and tell us if anything is still not working. 🙏'
+  'Our team is aware of the AA/smart wallet migration issue and is actively working on a fix. Please share your wallet address and screenshots so we can assist you further. 🙏',
+  'Thank you for reporting this. The AA/smart wallet migration issue is currently being investigated by our team. We appreciate your patience. 🙏'
 ];
 const EOA_SIGNING_FIXING_VARIANTS = [
   'Thank you for reporting this. We are still working on the EOA signing issue, and another fix will be deployed soon. We appreciate your patience. 🙏',
