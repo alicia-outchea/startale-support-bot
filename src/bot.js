@@ -1,19 +1,12 @@
 import 'dotenv/config';
 import {
   ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
   ChannelType,
   Client,
-  EmbedBuilder,
   Events,
   GatewayIntentBits,
-  ModalBuilder,
-  PermissionFlagsBits,
   StringSelectMenuBuilder,
-  StringSelectMenuOptionBuilder,
-  TextInputBuilder,
-  TextInputStyle
+  StringSelectMenuOptionBuilder
 } from 'discord.js';
 
 const {
@@ -53,9 +46,6 @@ const debugAutoReply = DEBUG_AUTOREPLY.toLowerCase() === 'true';
 const hasUsableOpenAIKey = OPENAI_API_KEY && !/여기에|token|key|토큰/i.test(OPENAI_API_KEY) && OPENAI_API_KEY.length > 20;
 let aiKeyWarningShown = false;
 const lastReplyByChannelUser = new Map();
-const OPEN_TICKET_BUTTON_ID = 'open_ticket';
-const CLOSE_TICKET_BUTTON_ID = 'close_ticket';
-const PANEL_COMMAND_NAME = 'ticketpanel';
 const DELETE_AUTO_REPLY_COMMAND_NAME = 'deletebotreply';
 const FAQ_COMMAND_NAME = 'faq';
 const FAQ_SELECT_MENU_ID = 'faq_select';
@@ -116,9 +106,6 @@ const FAQ_ITEMS = [
     answer: 'No. Transactions are not retroactively applied in order to ensure fairness for all participants.\n\nFor more information, please refer to the Startale USDSC FAQ.'
   }
 ];
-const OPEN_TICKET_MODAL_ID = 'open_ticket_modal';
-const SMART_WALLET_INPUT_ID = 'smart_wallet_address';
-const EOA_WALLET_INPUT_ID = 'eoa_wallet_address';
 const AUTO_REPLY_EXCLUDED_USER_IDS = new Set(
   SUPPORT_STAFF_IDS
     ? SUPPORT_STAFF_IDS.split(',').map(id => id.trim()).filter(Boolean)
@@ -570,68 +557,6 @@ async function getAIReply(content) {
   }
 }
 
-function buildTicketPermissions(guild, memberId) {
-  const permissionOverwrites = [
-    {
-      id: guild.roles.everyone.id,
-      deny: [PermissionFlagsBits.ViewChannel]
-    },
-    {
-      id: memberId,
-      allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.ReadMessageHistory]
-    },
-    {
-      id: client.user.id,
-      allow: [
-        PermissionFlagsBits.ViewChannel,
-        PermissionFlagsBits.SendMessages,
-        PermissionFlagsBits.ReadMessageHistory,
-        PermissionFlagsBits.ManageChannels
-      ]
-    }
-  ];
-
-  if (SUPPORT_ROLE_ID) {
-    permissionOverwrites.push({
-      id: SUPPORT_ROLE_ID,
-      allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.ReadMessageHistory]
-    });
-  }
-
-  return permissionOverwrites;
-}
-
-async function createTicketChannel(guild, memberId, smartWalletAddress, eoaWalletAddress) {
-  const existing = guild.channels.cache.find(
-    (ch) => ch.type === ChannelType.GuildText && ch.name === `${TICKET_CHANNEL_PREFIX}${memberId}`
-  );
-
-  if (existing) return { existing };
-
-  const channel = await guild.channels.create({
-    name: `${TICKET_CHANNEL_PREFIX}${memberId}`,
-    type: ChannelType.GuildText,
-    parent: TICKET_CATEGORY_ID || null,
-    permissionOverwrites: buildTicketPermissions(guild, memberId)
-  });
-
-  const closeRow = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId(CLOSE_TICKET_BUTTON_ID)
-      .setLabel('Close Ticket')
-      .setStyle(ButtonStyle.Danger)
-  );
-
-  await channel.send({
-    content:
-      `<@${memberId}> Your ticket is now open.\n` +
-      `Startale App Smart Wallet Address: \`${smartWalletAddress}\`\n` +
-      `Connected EOA Wallet Address: \`${eoaWalletAddress}\``,
-    components: [closeRow]
-  });
-
-  return { channel };
-}
 
 client.once(Events.ClientReady, (readyClient) => {
   console.log(`로그인 성공: ${readyClient.user.tag}`);
@@ -639,10 +564,6 @@ client.once(Events.ClientReady, (readyClient) => {
 
 client.once(Events.ClientReady, async () => {
   const commands = [
-    {
-      name: PANEL_COMMAND_NAME,
-      description: 'Send the ticket open button in this channel.'
-    },
     {
       name: DELETE_AUTO_REPLY_COMMAND_NAME,
       description: 'Delete the latest bot auto-reply in this ticket channel.'
@@ -659,13 +580,13 @@ client.once(Events.ClientReady, async () => {
       const guild = await client.guilds.fetch(GUILD_ID);
       await guild.commands.set(commands);
       await client.application.commands.set([]);
-      console.log(`길드 전용 슬래시 명령어 등록 완료: /${PANEL_COMMAND_NAME}`);
+      console.log(`길드 전용 슬래시 명령어 등록 완료`);
     } else {
       if (GUILD_ID) {
         console.warn('GUILD_ID 형식이 잘못되어 글로벌 명령어로 등록합니다. (.env 확인 필요)');
       }
       await client.application.commands.set(commands);
-      console.log(`글로벌 슬래시 명령어 등록 완료: /${PANEL_COMMAND_NAME} (전파에 시간이 걸릴 수 있음)`);
+      console.log(`글로벌 슬래시 명령어 등록 완료 (전파에 시간이 걸릴 수 있음)`);
     }
   } catch (error) {
     console.error('슬래시 명령어 등록 실패:', error);
@@ -721,102 +642,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
       });
       return;
     }
-
-    if (interaction.commandName !== PANEL_COMMAND_NAME) return;
-
-    const hasPermission = interaction.member.permissions.has(PermissionFlagsBits.ManageChannels);
-    if (!hasPermission) {
-      await interaction.reply({ content: 'Only administrators can use this command.', ephemeral: true });
-      return;
-    }
-
-    const row = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId(OPEN_TICKET_BUTTON_ID)
-        .setLabel('Open a support ticket!')
-        .setStyle(ButtonStyle.Success)
-    );
-
-    const panelEmbed = new EmbedBuilder()
-      .setColor(0xf1c40f)
-      .setDescription(
-        [
-          '**How can we assist you?**',
-          '',
-          'React below to open a private ticket with our team.',
-          '',
-          '• If its an onchain matter, please ensure to include your **wallet address** and **transaction hash**.',
-          '',
-          '**What we\'re looking for:**',
-          '',
-          '• Bug reports',
-          '• General feedback',
-          '• Questions about the app',
-          '',
-          'We\'ll respond as soon as possible. Thank you.'
-        ].join('\n')
-      );
-
-    await interaction.reply({
-      embeds: [panelEmbed],
-      components: [row]
-    });
-    return;
-  }
-
-  if (interaction.isButton() && interaction.inGuild() && interaction.customId === OPEN_TICKET_BUTTON_ID) {
-    const modal = new ModalBuilder()
-      .setCustomId(OPEN_TICKET_MODAL_ID)
-      .setTitle('Open Ticket');
-
-    const smartWalletInput = new TextInputBuilder()
-      .setCustomId(SMART_WALLET_INPUT_ID)
-      .setLabel('Startale App Smart Wallet Address')
-      .setStyle(TextInputStyle.Short)
-      .setRequired(true)
-      .setPlaceholder('Enter Smart Wallet address');
-
-    const eoaWalletInput = new TextInputBuilder()
-      .setCustomId(EOA_WALLET_INPUT_ID)
-      .setLabel('Connected EOA Wallet Address')
-      .setStyle(TextInputStyle.Short)
-      .setRequired(true)
-      .setPlaceholder('Enter EOA Wallet address');
-
-    modal.addComponents(
-      new ActionRowBuilder().addComponents(smartWalletInput),
-      new ActionRowBuilder().addComponents(eoaWalletInput)
-    );
-
-    await interaction.showModal(modal);
-    return;
-  }
-
-  if (interaction.isModalSubmit() && interaction.inGuild() && interaction.customId === OPEN_TICKET_MODAL_ID) {
-    const guild = interaction.guild;
-    const memberId = interaction.user.id;
-    const smartWalletAddress = interaction.fields.getTextInputValue(SMART_WALLET_INPUT_ID).trim();
-    const eoaWalletAddress = interaction.fields.getTextInputValue(EOA_WALLET_INPUT_ID).trim();
-
-    try {
-      const result = await createTicketChannel(guild, memberId, smartWalletAddress, eoaWalletAddress);
-      if (result.existing) {
-        await interaction.reply({
-          content: `You already have an open ticket: ${result.existing}`,
-          ephemeral: true
-        });
-        return;
-      }
-
-      await interaction.reply({
-        content: `Your ticket has been created: ${result.channel}`,
-        ephemeral: true
-      });
-    } catch (error) {
-      console.error('티켓 채널 생성 실패:', error);
-      await interaction.reply({ content: 'An error occurred while creating your ticket.', ephemeral: true });
-    }
-    return;
   }
 
   if (interaction.isStringSelectMenu() && interaction.inGuild() && interaction.customId === FAQ_SELECT_MENU_ID) {
@@ -834,28 +659,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
     return;
   }
 
-  if (!interaction.isButton()) return;
-  if (!interaction.inGuild()) return;
-
-  if (interaction.customId === CLOSE_TICKET_BUTTON_ID) {
-    const channel = interaction.channel;
-    if (!channel || channel.type !== ChannelType.GuildText) return;
-
-    const isTicket = isTicketChannel(channel);
-    if (!isTicket) {
-      await interaction.reply({ content: 'This button can only be used in a ticket channel.', ephemeral: true });
-      return;
-    }
-
-    await interaction.reply({ content: 'Closing ticket...' });
-    setTimeout(async () => {
-      try {
-        await channel.delete('Ticket closed by button');
-      } catch (error) {
-        console.error('티켓 삭제 실패:', error);
-      }
-    }, 1000);
-  }
 });
 
 client.on(Events.MessageCreate, async (message) => {
