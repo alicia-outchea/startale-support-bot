@@ -43,6 +43,10 @@ if (
 const cooldownMs = Number(AUTO_REPLY_COOLDOWN_SEC) * 1000;
 const aiEnabled = AI_ENABLED.toLowerCase() === 'true';
 const debugAutoReply = DEBUG_AUTOREPLY.toLowerCase() === 'true';
+
+const TICKET_KEEPALIVE_MESSAGE = 'Hey there, we are still actively resolving this ticket. Messaging here to ensure the ticket remains visable to you and the team. Thank you.';
+const TICKET_INACTIVITY_THRESHOLD_MS = 72 * 60 * 60 * 1000; // 72 hours
+const TICKET_KEEPALIVE_CHECK_INTERVAL_MS = 60 * 60 * 1000;  // check every hour
 const hasUsableOpenAIKey = OPENAI_API_KEY && !/여기에|token|key|토큰/i.test(OPENAI_API_KEY) && OPENAI_API_KEY.length > 20;
 let aiKeyWarningShown = false;
 const lastReplyByChannelUser = new Map();
@@ -220,6 +224,36 @@ function isTicketChannel(channel) {
   }
 
   return false;
+}
+
+async function checkAndSendKeepalive(channel) {
+  try {
+    const messages = await channel.messages.fetch({ limit: 1 });
+    const lastMessage = messages.first();
+    if (!lastMessage) return;
+    if (Date.now() - lastMessage.createdTimestamp >= TICKET_INACTIVITY_THRESHOLD_MS) {
+      await channel.send(TICKET_KEEPALIVE_MESSAGE);
+      debugLog('keepalive sent to channel', channel.id);
+    }
+  } catch {
+    // channel may be deleted or inaccessible — skip silently
+  }
+}
+
+async function sendTicketKeepalives() {
+  for (const guild of client.guilds.cache.values()) {
+    for (const channel of guild.channels.cache.values()) {
+      if (isTicketChannel(channel)) await checkAndSendKeepalive(channel);
+    }
+    try {
+      const { threads } = await guild.channels.fetchActiveThreads();
+      for (const thread of threads.values()) {
+        if (isTicketChannel(thread)) await checkAndSendKeepalive(thread);
+      }
+    } catch {
+      // ignore thread fetch errors
+    }
+  }
 }
 
 function shouldReply(channelId, userId, now) {
@@ -590,6 +624,10 @@ client.once(Events.ClientReady, async () => {
   } catch (error) {
     console.error('슬래시 명령어 등록 실패:', error);
   }
+
+  // Send a keepalive message in ticket channels inactive for 72+ hours
+  setInterval(sendTicketKeepalives, TICKET_KEEPALIVE_CHECK_INTERVAL_MS);
+  debugLog('ticket keepalive checker started (interval: 1h, threshold: 72h)');
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
