@@ -716,7 +716,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     await interaction.update({ components: [disabledRow] });
 
     if (selected === 'noa_mini_app') {
-      await interaction.channel.send(`Startale App 이슈는 이 티켓을 열어서 제보해주세요! <#${GENERAL_TICKET_CHANNEL_ID}>`);
+      await interaction.channel.send(`For Startale App issues, please open a ticket here! <#${GENERAL_TICKET_CHANNEL_ID}>`);
       debugLog('Mini App select: noa_mini_app selected in channel', interaction.channel.id);
       return;
     }
