@@ -192,8 +192,7 @@ const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
-    GatewayIntentBits.GuildMessageThreads
+    GatewayIntentBits.MessageContent
   ]
 });
 
@@ -854,6 +853,10 @@ client.on(Events.ThreadCreate, async (thread, newlyCreated) => {
   }
 
   if (!isTicketChannel(thread)) return;
+
+  // Join private threads so the bot can send messages in them
+  try { await thread.join(); } catch { /* ignore if already a member or no permission */ }
+
   await sendMiniAppSelectMenu(thread);
 });
 
