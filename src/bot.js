@@ -858,7 +858,12 @@ client.on(Events.ChannelCreate, async (channel) => {
 // Tickets created as threads
 client.on(Events.ThreadCreate, async (thread, newlyCreated) => {
   console.log(`[ThreadCreate] id=${thread.id} name="${thread.name}" newlyCreated=${newlyCreated} parentId=${thread.parentId}`);
-  if (!newlyCreated) return;
+
+  // newlyCreated=false happens when the bot is added to a private thread AFTER creation
+  // (ticket bot creates thread first, then adds our bot as a member).
+  // Still process if the thread was created within the last 5 minutes.
+  const threadAgeMs = Date.now() - thread.createdTimestamp;
+  if (!newlyCreated && threadAgeMs > 5 * 60 * 1000) return;
 
   // Fetch parent channel if not cached so isTicketChannel works correctly
   if (thread.isThread() && !thread.parent && thread.parentId) {
@@ -867,7 +872,7 @@ client.on(Events.ThreadCreate, async (thread, newlyCreated) => {
 
   const parentName = thread.parent?.name ?? '(no parent)';
   const isTicket = isTicketChannel(thread);
-  console.log(`[ThreadCreate] parent="${parentName}" isTicketChannel=${isTicket}`);
+  console.log(`[ThreadCreate] parent="${parentName}" isTicketChannel=${isTicket} ageMs=${threadAgeMs}`);
 
   if (!isTicket) return;
 
