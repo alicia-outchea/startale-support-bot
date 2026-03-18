@@ -783,6 +783,12 @@ const MINI_APP_ROLE_MAP = [
 
 client.on(Events.ThreadCreate, async (thread, newlyCreated) => {
   if (!newlyCreated) return;
+
+  // Fetch parent if not cached so isTicketChannel works correctly
+  if (thread.isThread() && !thread.parent) {
+    try { await thread.fetchStarterMessage(); } catch { /* ignore */ }
+  }
+
   if (!isTicketChannel(thread)) return;
 
   // Wait briefly for the initial bot message to be posted into the thread
@@ -790,10 +796,10 @@ client.on(Events.ThreadCreate, async (thread, newlyCreated) => {
 
   try {
     const messages = await thread.messages.fetch({ limit: 10 });
-    if (messages.size === 0) return;
 
-    // Scan ALL messages in the thread (content + all embed fields)
-    const fullText = [...messages.values()].map((m) => {
+    // Scan thread name + ALL messages in the thread (content + all embed fields)
+    const threadName = thread.name || '';
+    const messagesText = [...messages.values()].map((m) => {
       const content = m.content || '';
       const embeds = m.embeds.map((e) => [
         e.title,
@@ -803,7 +809,8 @@ client.on(Events.ThreadCreate, async (thread, newlyCreated) => {
         ...(e.fields?.map((f) => `${f.name} ${f.value}`) || [])
       ].filter(Boolean).join(' ')).join(' ');
       return `${content} ${embeds}`;
-    }).join(' ').toLowerCase();
+    }).join(' ');
+    const fullText = `${threadName} ${messagesText}`.toLowerCase();
 
     debugLog('ThreadCreate fullText:', fullText);
 
