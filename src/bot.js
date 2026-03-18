@@ -175,11 +175,6 @@ const STILL_FIXING_VARIANTS = [
   'We are still fixing this and doing our best to resolve it quickly. Thank you for your patience, and we will let you know as soon as it is fixed. 🙏',
   'We sincerely apologize for the delay. The issue is still under active investigation and fixing. We will keep you posted with updates.'
 ];
-const SCORE_REPLY_VARIANTS = [
-  "We're actively fixing the issue, please rest assured that score tracking is unaffected, all EOA activity and eligible actions across the Startale and Soneium ecosystem continue to count, and the Startale App Bonus will be reflected shortly.",
-  'Our team is actively fixing this issue. Please rest assured that score tracking is unaffected, all EOA activity and eligible actions across the Startale and Soneium ecosystem still count, and the Startale App Bonus will be reflected shortly.',
-  'We are currently working on this issue. Please rest assured that score tracking remains unaffected, all EOA activity and eligible actions across Startale and the Soneium ecosystem continue to count, and the Startale App Bonus will be reflected shortly.'
-];
 const SAKE_FINANCE_REPLY =
   'Sake Finance validation is now based on the total aggregated eligible transactions.\nIf your total is over $20, the task should be recognized.\n\nIf it is still not reflected, please share your wallet address and tx hash. 🙏';
 const STAR_POINT_LNY_REPLY =
@@ -379,19 +374,6 @@ function getRuleBasedReply(content) {
 
   if (isStarPointLnyIssue) {
     return withGreeting(STAR_POINT_LNY_REPLY);
-  }
-
-  const isScoreIssue =
-    (
-      includesAny(text, ['soneium', 'portal.soneium', 'soneium portal', 'score portal', 'soneium score', 'points', 'point', 'quest']) &&
-      includesAny(text, ["can't", 'cant', 'cannot', 'not open', 'unable', 'error', 'fail', 'failed', 'loop', 'not recognize', 'cannot access', 'cant access', "can't access", 'cant enter', "can't enter", 'access'])
-    ) ||
-    (includesAny(text, ['portal']) && includesAny(text, ['score', 'points', 'soneium']));
-
-  if (isScoreIssue) {
-    return withGreeting(
-      `${pickRandom(SCORE_REPLY_VARIANTS)}\n\nYou can check your Soneium Score directly here: ${SCORE_PORTAL_URL}`
-    );
   }
 
   const isPasskeyGoogleIssue =
@@ -859,11 +841,8 @@ async function sendMiniAppSelectMenu(channel) {
           new StringSelectMenuOptionBuilder().setLabel(r.label).setValue(r.value)
         ),
         new StringSelectMenuOptionBuilder()
-          .setLabel('Noa Mini App Issue')
-          .setValue('noa_mini_app'),
-        new StringSelectMenuOptionBuilder()
-          .setLabel('Not a Mini App issue')
-          .setValue('mini_app_none')
+          .setLabel('Not a Mini App Issue')
+          .setValue('noa_mini_app')
       ]);
 
     const row = new ActionRowBuilder().addComponents(selectMenu);
