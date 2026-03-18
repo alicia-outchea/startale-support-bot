@@ -23,9 +23,19 @@ const {
   ROLE_TAG_ESCALATION_MENTIONS = '@Alicia @Ramz @Jerad',
   DEBUG_AUTOREPLY = 'false',
   SUPPORT_STAFF_IDS = '',
-  MINI_APP_ALICIA_DEV_ROLE_ID = '1483709405806727293',
-  MINI_APP_RAMZ_DEV_ROLE_ID = '1483717804757614622',
-  MINI_APP_JERAD_DEV_ROLE_ID = '1483718067870498837'
+  MINI_APP_EL_HEXA_ROLE_ID = '1483709405806727293',
+  MINI_APP_MORNING_MOON_POCKET_ROLE_ID = '1483717804757614622',
+  MINI_APP_MORNING_FARM_ROLE_ID = '1483718067870498837',
+  MINI_APP_PACKFLIP_ROLE_ID = '1483849283714420857',
+  MINI_APP_PNYX_ROLE_ID = '1483849398986346557',
+  MINI_APP_AWAKENING_ROLE_ID = '1483849538165936209',
+  MINI_APP_POCKET_KNIGHTS_ROLE_ID = '1483849639525486714',
+  MINI_APP_WORLD_OF_TRINITY_ROLE_ID = '1483849828575350936',
+  MINI_APP_DICE_OR_DIE_ROLE_ID = '1483849911735943329',
+  MINI_APP_HEROES_ROLE_ID = '1483849970137305312',
+  MINI_APP_CLASH_HORSE_ROLE_ID = '1483850079331946697',
+  MINI_APP_NEKOCAT_ROLE_ID = '1483850186747805927',
+  MINI_APP_BURROW_BASH_ROLE_ID = '1483850354591400067'
 } = process.env;
 
 if (!DISCORD_TOKEN) {
@@ -825,9 +835,19 @@ const MINI_APP_SELECT_ID = 'mini_app_select';
 const MINI_APP_TICKET_CHANNEL_ID = '1425538271487721485';
 const GENERAL_TICKET_CHANNEL_ID = '1425558708943061132';
 const MINI_APP_ROLE_MAP = [
-  { value: 'mini_app_alicia', label: 'Mini App Alicia', roleId: MINI_APP_ALICIA_DEV_ROLE_ID },
-  { value: 'mini_app_ramz',   label: 'Mini App Ramz',   roleId: MINI_APP_RAMZ_DEV_ROLE_ID },
-  { value: 'mini_app_jerad',  label: 'Mini App Jerad',  roleId: MINI_APP_JERAD_DEV_ROLE_ID }
+  { value: 'mini_app_el_hexa',            label: 'El Hexa',                roleId: MINI_APP_EL_HEXA_ROLE_ID },
+  { value: 'mini_app_morning_moon_pocket', label: 'Morning Moon Pocket',   roleId: MINI_APP_MORNING_MOON_POCKET_ROLE_ID },
+  { value: 'mini_app_morning_farm',        label: 'Morning Farm',          roleId: MINI_APP_MORNING_FARM_ROLE_ID },
+  { value: 'mini_app_packflip',            label: 'Packflip',              roleId: MINI_APP_PACKFLIP_ROLE_ID },
+  { value: 'mini_app_pnyx',               label: 'PNYX/Press A/PIKIT',    roleId: MINI_APP_PNYX_ROLE_ID },
+  { value: 'mini_app_awakening',           label: 'Awakening of Guardians', roleId: MINI_APP_AWAKENING_ROLE_ID },
+  { value: 'mini_app_pocket_knights',      label: 'Pocket Knights',        roleId: MINI_APP_POCKET_KNIGHTS_ROLE_ID },
+  { value: 'mini_app_world_of_trinity',    label: 'World of Trinity',      roleId: MINI_APP_WORLD_OF_TRINITY_ROLE_ID },
+  { value: 'mini_app_dice_or_die',         label: 'Dice or Die',           roleId: MINI_APP_DICE_OR_DIE_ROLE_ID },
+  { value: 'mini_app_heroes',              label: 'Heroes of Hechanos',    roleId: MINI_APP_HEROES_ROLE_ID },
+  { value: 'mini_app_clash_horse',         label: 'Clash Horse',           roleId: MINI_APP_CLASH_HORSE_ROLE_ID },
+  { value: 'mini_app_nekocat',             label: 'Nekocat/Las Meta',      roleId: MINI_APP_NEKOCAT_ROLE_ID },
+  { value: 'mini_app_burrow_bash',         label: 'Burrow Bash',           roleId: MINI_APP_BURROW_BASH_ROLE_ID }
 ];
 
 async function sendMiniAppSelectMenu(channel) {
