@@ -841,11 +841,8 @@ async function sendMiniAppSelectMenu(channel) {
           new StringSelectMenuOptionBuilder().setLabel(r.label).setValue(r.value)
         ),
         new StringSelectMenuOptionBuilder()
-          .setLabel('Noa Mini App Issue')
-          .setValue('noa_mini_app'),
-        new StringSelectMenuOptionBuilder()
-          .setLabel('Not a Mini App issue')
-          .setValue('mini_app_none')
+          .setLabel('Not a Mini App Issue')
+          .setValue('noa_mini_app')
       ]);
 
     const row = new ActionRowBuilder().addComponents(selectMenu);
