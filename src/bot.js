@@ -715,6 +715,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
     );
     await interaction.update({ components: [disabledRow] });
 
+    if (selected === 'noa_mini_app') {
+      await interaction.channel.send(`Startale App 이슈는 이 티켓을 열어서 제보해주세요! <#${GENERAL_TICKET_CHANNEL_ID}>`);
+      debugLog('Mini App select: noa_mini_app selected in channel', interaction.channel.id);
+      return;
+    }
+
     if (selected === 'mini_app_none') {
       await interaction.channel.send('No Mini App developer assigned to this ticket.');
       debugLog('Mini App select: none selected in channel', interaction.channel.id);
@@ -820,6 +826,7 @@ client.on(Events.MessageCreate, async (message) => {
 
 const MINI_APP_SELECT_ID = 'mini_app_select';
 const MINI_APP_TICKET_CHANNEL_ID = '1425538271487721485';
+const GENERAL_TICKET_CHANNEL_ID = '1425558708943061132';
 const MINI_APP_ROLE_MAP = [
   { value: 'mini_app_alicia', label: 'Mini App Alicia', roleId: MINI_APP_ALICIA_DEV_ROLE_ID },
   { value: 'mini_app_ramz',   label: 'Mini App Ramz',   roleId: MINI_APP_RAMZ_DEV_ROLE_ID },
@@ -836,6 +843,9 @@ async function sendMiniAppSelectMenu(channel) {
         ...MINI_APP_ROLE_MAP.map((r) =>
           new StringSelectMenuOptionBuilder().setLabel(r.label).setValue(r.value)
         ),
+        new StringSelectMenuOptionBuilder()
+          .setLabel('Noa Mini App Issue')
+          .setValue('noa_mini_app'),
         new StringSelectMenuOptionBuilder()
           .setLabel('Not a Mini App issue')
           .setValue('mini_app_none')
