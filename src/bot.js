@@ -781,24 +781,14 @@ const MINI_APP_ROLE_MAP = [
   { keyword: 'mini app jerad',  roleId: MINI_APP_JERAD_DEV_ROLE_ID }
 ];
 
-client.on(Events.ThreadCreate, async (thread, newlyCreated) => {
-  if (!newlyCreated) return;
-
-  // Fetch parent channel if not cached so isTicketChannel works correctly
-  if (thread.isThread() && !thread.parent && thread.parentId) {
-    try { await thread.client.channels.fetch(thread.parentId); } catch { /* ignore */ }
-  }
-
-  if (!isTicketChannel(thread)) return;
-
-  // Wait briefly for the initial bot message to be posted into the thread
+async function scanAndPingMiniAppRole(channel) {
+  // Wait briefly for the ticket bot to post its initial message
   await new Promise((resolve) => setTimeout(resolve, 3000));
 
   try {
-    const messages = await thread.messages.fetch({ limit: 10 });
+    const messages = await channel.messages.fetch({ limit: 10 });
 
-    // Scan thread name + ALL messages in the thread (content + all embed fields)
-    const threadName = thread.name || '';
+    const channelName = channel.name || '';
     const messagesText = [...messages.values()].map((m) => {
       const content = m.content || '';
       const embeds = m.embeds.map((e) => [
@@ -810,18 +800,37 @@ client.on(Events.ThreadCreate, async (thread, newlyCreated) => {
       ].filter(Boolean).join(' ')).join(' ');
       return `${content} ${embeds}`;
     }).join(' ');
-    const fullText = `${threadName} ${messagesText}`.toLowerCase();
+    const fullText = `${channelName} ${messagesText}`.toLowerCase();
 
-    debugLog('ThreadCreate fullText:', fullText);
+    debugLog('Mini App scan fullText:', fullText);
 
     const matched = MINI_APP_ROLE_MAP.find(({ keyword }) => fullText.includes(keyword));
     if (matched) {
-      await thread.send(`<@&${matched.roleId}>`);
-      debugLog('Mini App Dev role mentioned in thread', thread.id, matched.keyword);
+      await channel.send(`<@&${matched.roleId}>`);
+      debugLog('Mini App Dev role pinged in channel', channel.id, matched.keyword);
     }
   } catch (error) {
-    console.error('ThreadCreate role mention failed:', error);
+    console.error('Mini App role ping failed:', error);
   }
+}
+
+// Tickets created as text channels
+client.on(Events.ChannelCreate, async (channel) => {
+  if (!isTicketChannel(channel)) return;
+  await scanAndPingMiniAppRole(channel);
+});
+
+// Tickets created as threads
+client.on(Events.ThreadCreate, async (thread, newlyCreated) => {
+  if (!newlyCreated) return;
+
+  // Fetch parent channel if not cached so isTicketChannel works correctly
+  if (thread.isThread() && !thread.parent && thread.parentId) {
+    try { await thread.client.channels.fetch(thread.parentId); } catch { /* ignore */ }
+  }
+
+  if (!isTicketChannel(thread)) return;
+  await scanAndPingMiniAppRole(thread);
 });
 
 client.login(tokenTrimmed);
