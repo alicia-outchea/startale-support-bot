@@ -790,14 +790,22 @@ client.on(Events.ThreadCreate, async (thread, newlyCreated) => {
 
   try {
     const messages = await thread.messages.fetch({ limit: 10 });
-    const initialMessage = messages.last(); // oldest message in thread
-    if (!initialMessage) return;
+    if (messages.size === 0) return;
 
-    const contentText = initialMessage.content || '';
-    const embedText = initialMessage.embeds
-      .map((e) => [e.title, e.description, ...(e.fields?.map((f) => f.value) || [])].join(' '))
-      .join(' ');
-    const fullText = (contentText + ' ' + embedText).toLowerCase();
+    // Scan ALL messages in the thread (content + all embed fields)
+    const fullText = [...messages.values()].map((m) => {
+      const content = m.content || '';
+      const embeds = m.embeds.map((e) => [
+        e.title,
+        e.description,
+        e.footer?.text,
+        e.author?.name,
+        ...(e.fields?.map((f) => `${f.name} ${f.value}`) || [])
+      ].filter(Boolean).join(' ')).join(' ');
+      return `${content} ${embeds}`;
+    }).join(' ').toLowerCase();
+
+    debugLog('ThreadCreate fullText:', fullText);
 
     const matched = MINI_APP_ROLE_MAP.find(({ keyword }) => fullText.includes(keyword));
     if (matched) {
