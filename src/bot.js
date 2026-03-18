@@ -784,11 +784,14 @@ client.on(Events.MessageCreate, async (message) => {
   }
   // Fallback: send mini app select menu if it was never sent in this channel
   // (handles bot restarts or missed ThreadCreate events)
-  if (!MINI_APP_MENU_SENT_IDS.has(message.channel.id)) {
+  // Only send mini app select menu for threads in the mini app ticket channel
+  if (
+    message.channel.isThread() &&
+    message.channel.parentId === MINI_APP_TICKET_CHANNEL_ID &&
+    !MINI_APP_MENU_SENT_IDS.has(message.channel.id)
+  ) {
     MINI_APP_MENU_SENT_IDS.add(message.channel.id);
-    if (message.channel.isThread()) {
-      try { await message.channel.join(); } catch { /* ignore */ }
-    }
+    try { await message.channel.join(); } catch { /* ignore */ }
     sendMiniAppSelectMenu(message.channel); // intentionally not awaited
   }
 
@@ -816,6 +819,7 @@ client.on(Events.MessageCreate, async (message) => {
 });
 
 const MINI_APP_SELECT_ID = 'mini_app_select';
+const MINI_APP_TICKET_CHANNEL_ID = '1425538271487721485';
 const MINI_APP_ROLE_MAP = [
   { value: 'mini_app_alicia', label: 'Mini App Alicia', roleId: MINI_APP_ALICIA_DEV_ROLE_ID },
   { value: 'mini_app_ramz',   label: 'Mini App Ramz',   roleId: MINI_APP_RAMZ_DEV_ROLE_ID },
@@ -864,6 +868,9 @@ client.on(Events.ThreadCreate, async (thread, newlyCreated) => {
   // Still process if the thread was created within the last 5 minutes.
   const threadAgeMs = Date.now() - thread.createdTimestamp;
   if (!newlyCreated && threadAgeMs > 5 * 60 * 1000) return;
+
+  // Only send mini app select menu for threads in the mini app ticket channel
+  if (thread.parentId !== MINI_APP_TICKET_CHANNEL_ID) return;
 
   // Fetch parent channel if not cached so isTicketChannel works correctly
   if (thread.isThread() && !thread.parent && thread.parentId) {
