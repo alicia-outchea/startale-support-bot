@@ -22,7 +22,8 @@ const {
   SCORE_PORTAL_URL = 'https://portal.soneium.org/en/profile/YOUR_WALLET_ADDRESS',
   ROLE_TAG_ESCALATION_MENTIONS = '@Alicia @Ramz @Jerad',
   DEBUG_AUTOREPLY = 'false',
-  SUPPORT_STAFF_IDS = ''
+  SUPPORT_STAFF_IDS = '',
+  MINI_APP_ALICIA_DEV_ROLE_ID = '1483709405806727293'
 } = process.env;
 
 if (!DISCORD_TOKEN) {
@@ -769,6 +770,34 @@ client.on(Events.MessageCreate, async (message) => {
     return;
   } catch (error) {
     console.error('자동응답 전송 실패:', error);
+  }
+});
+
+client.on(Events.ThreadCreate, async (thread, newlyCreated) => {
+  if (!newlyCreated) return;
+  if (!isTicketChannel(thread)) return;
+  if (!MINI_APP_ALICIA_DEV_ROLE_ID) return;
+
+  // Wait briefly for the initial bot message to be posted into the thread
+  await new Promise((resolve) => setTimeout(resolve, 3000));
+
+  try {
+    const messages = await thread.messages.fetch({ limit: 10 });
+    const initialMessage = messages.last(); // oldest message in thread
+    if (!initialMessage) return;
+
+    const contentText = initialMessage.content || '';
+    const embedText = initialMessage.embeds
+      .map((e) => [e.title, e.description, ...(e.fields?.map((f) => f.value) || [])].join(' '))
+      .join(' ');
+    const fullText = (contentText + ' ' + embedText).toLowerCase();
+
+    if (fullText.includes('mini app alicia')) {
+      await thread.send(`<@&${MINI_APP_ALICIA_DEV_ROLE_ID}>`);
+      debugLog('Mini App Alicia Dev role mentioned in thread', thread.id);
+    }
+  } catch (error) {
+    console.error('ThreadCreate role mention failed:', error);
   }
 });
 
