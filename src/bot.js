@@ -12,7 +12,7 @@ import {
 const {
   DISCORD_TOKEN,
   GUILD_ID,
-  TICKET_CATEGORY_ID,
+  TICKET_CATEGORY_ID = '1483833391378862224',
   SUPPORT_ROLE_ID,
   TICKET_CHANNEL_PREFIX = 'ticket-',
   AUTO_REPLY_COOLDOWN_SEC = '300',
@@ -832,7 +832,7 @@ client.on(Events.MessageCreate, async (message) => {
 });
 
 const MINI_APP_SELECT_ID = 'mini_app_select';
-const MINI_APP_TICKET_CHANNEL_ID = '1425538271487721485';
+const MINI_APP_TICKET_CHANNEL_ID = '1483833764160475207';
 const GENERAL_TICKET_CHANNEL_ID = '1425558708943061132';
 const MINI_APP_ROLE_MAP = [
   { value: 'mini_app_el_hexa',            label: 'El Hexa',                roleId: MINI_APP_EL_HEXA_ROLE_ID },
