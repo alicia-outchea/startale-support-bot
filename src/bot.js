@@ -784,9 +784,9 @@ const MINI_APP_ROLE_MAP = [
 client.on(Events.ThreadCreate, async (thread, newlyCreated) => {
   if (!newlyCreated) return;
 
-  // Fetch parent if not cached so isTicketChannel works correctly
-  if (thread.isThread() && !thread.parent) {
-    try { await thread.fetchStarterMessage(); } catch { /* ignore */ }
+  // Fetch parent channel if not cached so isTicketChannel works correctly
+  if (thread.isThread() && !thread.parent && thread.parentId) {
+    try { await thread.client.channels.fetch(thread.parentId); } catch { /* ignore */ }
   }
 
   if (!isTicketChannel(thread)) return;
