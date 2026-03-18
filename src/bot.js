@@ -119,6 +119,7 @@ const AUTO_REPLY_EXCLUDED_USER_IDS = new Set(
     : []
 );
 const MANUAL_HANDOFF_CHANNEL_IDS = new Set();
+const MINI_APP_MENU_SENT_IDS = new Set();
 const SUPPORT_TEST_PREFIX = '!test ';
 const FIXING_GREETING = 'Hello, thank you for the report!';
 const GENERAL_FIXING_VARIANTS = [
@@ -781,6 +782,16 @@ client.on(Events.MessageCreate, async (message) => {
     debugLog('failed to fetch history for handoff check, skipping channel', message.channel.id);
     return;
   }
+  // Fallback: send mini app select menu if it was never sent in this channel
+  // (handles bot restarts or missed ThreadCreate events)
+  if (!MINI_APP_MENU_SENT_IDS.has(message.channel.id)) {
+    MINI_APP_MENU_SENT_IDS.add(message.channel.id);
+    if (message.channel.isThread()) {
+      try { await message.channel.join(); } catch { /* ignore */ }
+    }
+    sendMiniAppSelectMenu(message.channel); // intentionally not awaited
+  }
+
   if (message.mentions.roles.size > 0 || message.mentions.everyone) {
     await sendAutoReply(message, ROLE_TAG_ESCALATION_MENTIONS);
     return;
@@ -831,6 +842,7 @@ async function sendMiniAppSelectMenu(channel) {
       content: 'What Mini App are you having issue with?',
       components: [row]
     });
+    MINI_APP_MENU_SENT_IDS.add(channel.id);
     debugLog('Mini App select menu sent to channel', channel.id);
   } catch (error) {
     console.error('Mini App select menu send failed:', error);
