@@ -22,7 +22,10 @@ const {
   SCORE_PORTAL_URL = 'https://portal.soneium.org/en/profile/YOUR_WALLET_ADDRESS',
   ROLE_TAG_ESCALATION_MENTIONS = '@Alicia @Ramz @Jerad',
   DEBUG_AUTOREPLY = 'false',
-  SUPPORT_STAFF_IDS = ''
+  SUPPORT_STAFF_IDS = '',
+  MINI_APP_ALICIA_DEV_ROLE_ID = '1483709405806727293',
+  MINI_APP_RAMZ_DEV_ROLE_ID = '1483717804757614622',
+  MINI_APP_JERAD_DEV_ROLE_ID = '1483718067870498837'
 } = process.env;
 
 if (!DISCORD_TOKEN) {
@@ -769,6 +772,48 @@ client.on(Events.MessageCreate, async (message) => {
     return;
   } catch (error) {
     console.error('자동응답 전송 실패:', error);
+  }
+});
+
+const MINI_APP_ROLE_MAP = [
+  { keyword: 'mini app alicia', roleId: MINI_APP_ALICIA_DEV_ROLE_ID },
+  { keyword: 'mini app ramz',   roleId: MINI_APP_RAMZ_DEV_ROLE_ID },
+  { keyword: 'mini app jerad',  roleId: MINI_APP_JERAD_DEV_ROLE_ID }
+];
+
+client.on(Events.ThreadCreate, async (thread, newlyCreated) => {
+  if (!newlyCreated) return;
+  if (!isTicketChannel(thread)) return;
+
+  // Wait briefly for the initial bot message to be posted into the thread
+  await new Promise((resolve) => setTimeout(resolve, 3000));
+
+  try {
+    const messages = await thread.messages.fetch({ limit: 10 });
+    if (messages.size === 0) return;
+
+    // Scan ALL messages in the thread (content + all embed fields)
+    const fullText = [...messages.values()].map((m) => {
+      const content = m.content || '';
+      const embeds = m.embeds.map((e) => [
+        e.title,
+        e.description,
+        e.footer?.text,
+        e.author?.name,
+        ...(e.fields?.map((f) => `${f.name} ${f.value}`) || [])
+      ].filter(Boolean).join(' ')).join(' ');
+      return `${content} ${embeds}`;
+    }).join(' ').toLowerCase();
+
+    debugLog('ThreadCreate fullText:', fullText);
+
+    const matched = MINI_APP_ROLE_MAP.find(({ keyword }) => fullText.includes(keyword));
+    if (matched) {
+      await thread.send(`<@&${matched.roleId}>`);
+      debugLog('Mini App Dev role mentioned in thread', thread.id, matched.keyword);
+    }
+  } catch (error) {
+    console.error('ThreadCreate role mention failed:', error);
   }
 });
 
