@@ -828,7 +828,7 @@ async function sendMiniAppSelectMenu(channel) {
 
     const row = new ActionRowBuilder().addComponents(selectMenu);
     await channel.send({
-      content: 'Is this ticket related to a Mini App? Please select the responsible developer:',
+      content: 'What Mini App are you having issue with?',
       components: [row]
     });
     debugLog('Mini App select menu sent to channel', channel.id);
