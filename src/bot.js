@@ -23,7 +23,9 @@ const {
   ROLE_TAG_ESCALATION_MENTIONS = '@Alicia @Ramz @Jerad',
   DEBUG_AUTOREPLY = 'false',
   SUPPORT_STAFF_IDS = '',
-  MINI_APP_ALICIA_DEV_ROLE_ID = '1483709405806727293'
+  MINI_APP_ALICIA_DEV_ROLE_ID = '1483709405806727293',
+  MINI_APP_RAMZ_DEV_ROLE_ID = '1483717804757614622',
+  MINI_APP_JERAD_DEV_ROLE_ID = '1483718067870498837'
 } = process.env;
 
 if (!DISCORD_TOKEN) {
@@ -773,10 +775,15 @@ client.on(Events.MessageCreate, async (message) => {
   }
 });
 
+const MINI_APP_ROLE_MAP = [
+  { keyword: 'mini app alicia', roleId: MINI_APP_ALICIA_DEV_ROLE_ID },
+  { keyword: 'mini app ramz',   roleId: MINI_APP_RAMZ_DEV_ROLE_ID },
+  { keyword: 'mini app jerad',  roleId: MINI_APP_JERAD_DEV_ROLE_ID }
+];
+
 client.on(Events.ThreadCreate, async (thread, newlyCreated) => {
   if (!newlyCreated) return;
   if (!isTicketChannel(thread)) return;
-  if (!MINI_APP_ALICIA_DEV_ROLE_ID) return;
 
   // Wait briefly for the initial bot message to be posted into the thread
   await new Promise((resolve) => setTimeout(resolve, 3000));
@@ -792,9 +799,10 @@ client.on(Events.ThreadCreate, async (thread, newlyCreated) => {
       .join(' ');
     const fullText = (contentText + ' ' + embedText).toLowerCase();
 
-    if (fullText.includes('mini app alicia')) {
-      await thread.send(`<@&${MINI_APP_ALICIA_DEV_ROLE_ID}>`);
-      debugLog('Mini App Alicia Dev role mentioned in thread', thread.id);
+    const matched = MINI_APP_ROLE_MAP.find(({ keyword }) => fullText.includes(keyword));
+    if (matched) {
+      await thread.send(`<@&${matched.roleId}>`);
+      debugLog('Mini App Dev role mentioned in thread', thread.id, matched.keyword);
     }
   } catch (error) {
     console.error('ThreadCreate role mention failed:', error);
