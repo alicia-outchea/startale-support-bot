@@ -699,6 +699,35 @@ client.on(Events.InteractionCreate, async (interaction) => {
     return;
   }
 
+  if (interaction.isStringSelectMenu() && interaction.inGuild() && interaction.customId === MINI_APP_SELECT_ID) {
+    const selected = interaction.values[0];
+
+    // Disable the select menu after selection
+    const disabledRow = new ActionRowBuilder().addComponents(
+      new StringSelectMenuBuilder()
+        .setCustomId(MINI_APP_SELECT_ID)
+        .setPlaceholder('Selection recorded.')
+        .setDisabled(true)
+        .addOptions(
+          new StringSelectMenuOptionBuilder().setLabel('Selection recorded.').setValue('_placeholder')
+        )
+    );
+    await interaction.update({ components: [disabledRow] });
+
+    if (selected === 'mini_app_none') {
+      await interaction.channel.send('No Mini App developer assigned to this ticket.');
+      debugLog('Mini App select: none selected in channel', interaction.channel.id);
+      return;
+    }
+
+    const match = MINI_APP_ROLE_MAP.find((r) => r.value === selected);
+    if (match) {
+      await interaction.channel.send(`This ticket has been tagged: **${match.label}**\n<@&${match.roleId}>`);
+      debugLog('Mini App Dev role pinged via select in channel', interaction.channel.id, match.label);
+    }
+    return;
+  }
+
 });
 
 client.on(Events.MessageCreate, async (message) => {
@@ -775,49 +804,43 @@ client.on(Events.MessageCreate, async (message) => {
   }
 });
 
+const MINI_APP_SELECT_ID = 'mini_app_select';
 const MINI_APP_ROLE_MAP = [
-  { keyword: 'mini app alicia', roleId: MINI_APP_ALICIA_DEV_ROLE_ID },
-  { keyword: 'mini app ramz',   roleId: MINI_APP_RAMZ_DEV_ROLE_ID },
-  { keyword: 'mini app jerad',  roleId: MINI_APP_JERAD_DEV_ROLE_ID }
+  { value: 'mini_app_alicia', label: 'Mini App Alicia', roleId: MINI_APP_ALICIA_DEV_ROLE_ID },
+  { value: 'mini_app_ramz',   label: 'Mini App Ramz',   roleId: MINI_APP_RAMZ_DEV_ROLE_ID },
+  { value: 'mini_app_jerad',  label: 'Mini App Jerad',  roleId: MINI_APP_JERAD_DEV_ROLE_ID }
 ];
 
-async function scanAndPingMiniAppRole(channel) {
-  // Wait briefly for the ticket bot to post its initial message
-  await new Promise((resolve) => setTimeout(resolve, 3000));
-
+async function sendMiniAppSelectMenu(channel) {
+  await new Promise((resolve) => setTimeout(resolve, 2000));
   try {
-    const messages = await channel.messages.fetch({ limit: 10 });
+    const selectMenu = new StringSelectMenuBuilder()
+      .setCustomId(MINI_APP_SELECT_ID)
+      .setPlaceholder('Select the Mini App developer...')
+      .addOptions([
+        ...MINI_APP_ROLE_MAP.map((r) =>
+          new StringSelectMenuOptionBuilder().setLabel(r.label).setValue(r.value)
+        ),
+        new StringSelectMenuOptionBuilder()
+          .setLabel('Not a Mini App issue')
+          .setValue('mini_app_none')
+      ]);
 
-    const channelName = channel.name || '';
-    const messagesText = [...messages.values()].map((m) => {
-      const content = m.content || '';
-      const embeds = m.embeds.map((e) => [
-        e.title,
-        e.description,
-        e.footer?.text,
-        e.author?.name,
-        ...(e.fields?.map((f) => `${f.name} ${f.value}`) || [])
-      ].filter(Boolean).join(' ')).join(' ');
-      return `${content} ${embeds}`;
-    }).join(' ');
-    const fullText = `${channelName} ${messagesText}`.toLowerCase();
-
-    debugLog('Mini App scan fullText:', fullText);
-
-    const matched = MINI_APP_ROLE_MAP.find(({ keyword }) => fullText.includes(keyword));
-    if (matched) {
-      await channel.send(`<@&${matched.roleId}>`);
-      debugLog('Mini App Dev role pinged in channel', channel.id, matched.keyword);
-    }
+    const row = new ActionRowBuilder().addComponents(selectMenu);
+    await channel.send({
+      content: 'Is this ticket related to a Mini App? Please select the responsible developer:',
+      components: [row]
+    });
+    debugLog('Mini App select menu sent to channel', channel.id);
   } catch (error) {
-    console.error('Mini App role ping failed:', error);
+    console.error('Mini App select menu send failed:', error);
   }
 }
 
 // Tickets created as text channels
 client.on(Events.ChannelCreate, async (channel) => {
   if (!isTicketChannel(channel)) return;
-  await scanAndPingMiniAppRole(channel);
+  await sendMiniAppSelectMenu(channel);
 });
 
 // Tickets created as threads
@@ -830,7 +853,7 @@ client.on(Events.ThreadCreate, async (thread, newlyCreated) => {
   }
 
   if (!isTicketChannel(thread)) return;
-  await scanAndPingMiniAppRole(thread);
+  await sendMiniAppSelectMenu(thread);
 });
 
 client.login(tokenTrimmed);
