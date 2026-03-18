@@ -857,6 +857,7 @@ client.on(Events.ChannelCreate, async (channel) => {
 
 // Tickets created as threads
 client.on(Events.ThreadCreate, async (thread, newlyCreated) => {
+  console.log(`[ThreadCreate] id=${thread.id} name="${thread.name}" newlyCreated=${newlyCreated} parentId=${thread.parentId}`);
   if (!newlyCreated) return;
 
   // Fetch parent channel if not cached so isTicketChannel works correctly
@@ -864,10 +865,19 @@ client.on(Events.ThreadCreate, async (thread, newlyCreated) => {
     try { await thread.client.channels.fetch(thread.parentId); } catch { /* ignore */ }
   }
 
-  if (!isTicketChannel(thread)) return;
+  const parentName = thread.parent?.name ?? '(no parent)';
+  const isTicket = isTicketChannel(thread);
+  console.log(`[ThreadCreate] parent="${parentName}" isTicketChannel=${isTicket}`);
+
+  if (!isTicket) return;
 
   // Join private threads so the bot can send messages in them
-  try { await thread.join(); } catch { /* ignore if already a member or no permission */ }
+  try {
+    await thread.join();
+    console.log(`[ThreadCreate] joined thread ${thread.id}`);
+  } catch (err) {
+    console.warn(`[ThreadCreate] join failed for thread ${thread.id}:`, err.message);
+  }
 
   await sendMiniAppSelectMenu(thread);
 });
