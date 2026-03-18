@@ -193,7 +193,8 @@ const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildMembers
   ]
 });
 
@@ -731,6 +732,20 @@ client.on(Events.InteractionCreate, async (interaction) => {
     if (match) {
       await interaction.channel.send(`This ticket has been tagged: **${match.label}**\n<@&${match.roleId}>`);
       debugLog('Mini App Dev role pinged via select in channel', interaction.channel.id, match.label);
+
+      // Add all members with the role to the thread so they can see it
+      if (interaction.channel.isThread()) {
+        try {
+          const role = await interaction.guild.roles.fetch(match.roleId);
+          if (role) {
+            const members = role.members;
+            await Promise.all(members.map((member) => interaction.channel.members.add(member.id).catch(() => {})));
+            debugLog('Added', members.size, 'role members to thread', interaction.channel.id);
+          }
+        } catch (err) {
+          console.error('Failed to add role members to thread:', err);
+        }
+      }
     }
     return;
   }
