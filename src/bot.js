@@ -807,28 +807,6 @@ client.on(Events.MessageCreate, async (message) => {
     try { await message.channel.join(); } catch { /* ignore */ }
     sendMiniAppSelectMenu(message.channel); // intentionally not awaited
   }
-
-  if (message.mentions.roles.size > 0 || message.mentions.everyone) {
-    await sendAutoReply(message, ROLE_TAG_ESCALATION_MENTIONS);
-    return;
-  }
-
-  const now = Date.now();
-  if (!shouldReply(message.channel.id, message.author.id, now)) return;
-  if (!shouldReplyForContent(message.channel.id, message.author.id, message.content, now)) return;
-
-  try {
-    const ruleBasedReply = getRuleBasedReply(message.content);
-    if (ruleBasedReply) {
-      debugLog('rule matched for channel', message.channel.id, 'user', message.author.id);
-      await sendAutoReply(message, ruleBasedReply);
-      return;
-    }
-    debugLog('no rule matched for content:', message.content);
-    return;
-  } catch (error) {
-    console.error('자동응답 전송 실패:', error);
-  }
 });
 
 const MINI_APP_SELECT_ID = 'mini_app_select';
