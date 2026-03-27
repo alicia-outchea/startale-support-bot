@@ -722,22 +722,29 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
     const match = MINI_APP_ROLE_MAP.find((r) => r.value === selected);
     if (match) {
-      // Fetch all guild members so role.members cache is populated
       try {
         await interaction.guild.members.fetch();
         const role = await interaction.guild.roles.fetch(match.roleId);
-        if (role && role.members.size > 0) {
-          // Mention each member individually — Discord auto-adds mentioned users to threads
-          const mentions = role.members.map((m) => `<@${m.id}>`).join(' ');
+        const members = role ? role.members : null;
+
+        if (members && members.size > 0) {
+          const mentions = members.map((m) => `<@${m.id}>`).join(' ');
           await interaction.channel.send(`This ticket has been tagged: **${match.label}**\n${mentions}`);
-          debugLog('Mini App Dev members mentioned in channel', interaction.channel.id, match.label, role.members.size);
+          // Explicitly add each member to the thread (required for private threads — bot mentions don't auto-add)
+          if (interaction.channel.isThread()) {
+            await Promise.all(
+              members.map((m) =>
+                interaction.channel.members.add(m.id).catch((e) => console.error(`Failed to add ${m.id} to thread:`, e))
+              )
+            );
+            debugLog('Added', members.size, 'role members to thread', interaction.channel.id);
+          }
         } else {
-          // Fallback to role mention if no members found
           await interaction.channel.send(`This ticket has been tagged: **${match.label}**\n<@&${match.roleId}>`);
           debugLog('Mini App Dev role pinged (no members found) in channel', interaction.channel.id, match.label);
         }
       } catch (err) {
-        console.error('Failed to mention Mini App dev members:', err);
+        console.error('Failed to tag Mini App dev members:', err);
         await interaction.channel.send(`This ticket has been tagged: **${match.label}**\n<@&${match.roleId}>`);
       }
     }
