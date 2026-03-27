@@ -722,30 +722,23 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
     const match = MINI_APP_ROLE_MAP.find((r) => r.value === selected);
     if (match) {
-      try {
-        await interaction.guild.members.fetch();
-        const role = await interaction.guild.roles.fetch(match.roleId);
-        const members = role ? role.members : null;
-
-        if (members && members.size > 0) {
-          const mentions = members.map((m) => `<@${m.id}>`).join(' ');
-          await interaction.channel.send(`This ticket has been tagged: **${match.label}**\n${mentions}`);
-          // Explicitly add each member to the thread (required for private threads — bot mentions don't auto-add)
-          if (interaction.channel.isThread()) {
+      await interaction.channel.send(`This ticket has been tagged: **${match.label}**\n<@&${match.roleId}>`);
+      // Explicitly add each role member to the thread (private threads require this)
+      if (interaction.channel.isThread()) {
+        try {
+          await interaction.guild.members.fetch();
+          const role = await interaction.guild.roles.fetch(match.roleId);
+          if (role) {
             await Promise.all(
-              members.map((m) =>
+              role.members.map((m) =>
                 interaction.channel.members.add(m.id).catch((e) => console.error(`Failed to add ${m.id} to thread:`, e))
               )
             );
-            debugLog('Added', members.size, 'role members to thread', interaction.channel.id);
+            debugLog('Added', role.members.size, 'role members to thread', interaction.channel.id);
           }
-        } else {
-          await interaction.channel.send(`This ticket has been tagged: **${match.label}**\n<@&${match.roleId}>`);
-          debugLog('Mini App Dev role pinged (no members found) in channel', interaction.channel.id, match.label);
+        } catch (err) {
+          console.error('Failed to add role members to thread:', err);
         }
-      } catch (err) {
-        console.error('Failed to tag Mini App dev members:', err);
-        await interaction.channel.send(`This ticket has been tagged: **${match.label}**\n<@&${match.roleId}>`);
       }
     }
     return;
