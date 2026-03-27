@@ -728,6 +728,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
       // Add all members with the role to the thread so they can see it
       if (interaction.channel.isThread()) {
         try {
+          await interaction.guild.members.fetch();
           const role = await interaction.guild.roles.fetch(match.roleId);
           if (role) {
             const members = role.members;
