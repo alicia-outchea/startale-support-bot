@@ -797,18 +797,6 @@ client.on(Events.MessageCreate, async (message) => {
     debugLog('failed to fetch history for handoff check, skipping channel', message.channel.id);
     return;
   }
-  // Fallback: send mini app select menu if it was never sent in this channel
-  // (handles bot restarts or missed ThreadCreate events)
-  // Only send mini app select menu for threads in the mini app ticket channel
-  if (
-    message.channel.isThread() &&
-    message.channel.parentId === MINI_APP_TICKET_CHANNEL_ID &&
-    !MINI_APP_MENU_SENT_IDS.has(message.channel.id)
-  ) {
-    MINI_APP_MENU_SENT_IDS.add(message.channel.id);
-    try { await message.channel.join(); } catch { /* ignore */ }
-    sendMiniAppSelectMenu(message.channel); // intentionally not awaited
-  }
 });
 
 const MINI_APP_SELECT_ID = 'mini_app_select';
