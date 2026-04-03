@@ -59,7 +59,7 @@ const aiEnabled = AI_ENABLED.toLowerCase() === 'true';
 const debugAutoReply = DEBUG_AUTOREPLY.toLowerCase() === 'true';
 
 const TICKET_KEEPALIVE_MESSAGE = 'Hey there, we are still actively resolving this ticket. Messaging here to ensure the ticket remains visable to you and the team. Thank you.';
-const TICKET_INACTIVITY_THRESHOLD_MS = 72 * 60 * 60 * 1000; // 72 hours
+const TICKET_INACTIVITY_THRESHOLD_MS = 120 * 60 * 60 * 1000; // 120 hours (5 days)
 const TICKET_KEEPALIVE_CHECK_INTERVAL_MS = 60 * 60 * 1000;  // check every hour
 const hasUsableOpenAIKey = OPENAI_API_KEY && !/여기에|token|key|토큰/i.test(OPENAI_API_KEY) && OPENAI_API_KEY.length > 20;
 let aiKeyWarningShown = false;
