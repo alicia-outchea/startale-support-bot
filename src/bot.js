@@ -36,7 +36,9 @@ const {
   MINI_APP_CLASH_HORSE_ROLE_ID = '1483850079331946697',
   MINI_APP_NEKOCAT_ROLE_ID = '1483850186747805927',
   MINI_APP_BURROW_BASH_ROLE_ID = '1483850354591400067',
-  MINI_APP_COOL_CATS_ROLE_ID = '1489106591667060736'
+  MINI_APP_COOL_CATS_ROLE_ID = '1489106591667060736',
+  MINI_APP_YOKI_ARCADE_ROLE_ID = '1501218559760793660',
+  MINI_APP_CLAW_MACHINE_ROLE_ID = '1496550892160155929'
 } = process.env;
 
 if (!DISCORD_TOKEN) {
@@ -815,9 +817,11 @@ const MINI_APP_ROLE_MAP = [
   { value: 'mini_app_dice_or_die',         label: 'Dice or Die',           roleId: MINI_APP_DICE_OR_DIE_ROLE_ID },
   { value: 'mini_app_heroes',              label: 'Heroes of Hecanos',    roleId: MINI_APP_HEROES_ROLE_ID },
   { value: 'mini_app_clash_horse',         label: 'Clash Horse',           roleId: MINI_APP_CLASH_HORSE_ROLE_ID },
-  { value: 'mini_app_nekocat',             label: 'Nekocat/Las Meta',      roleId: MINI_APP_NEKOCAT_ROLE_ID },
+  { value: 'mini_app_nekocat',             label: 'Nekocat/CardWars',      roleId: MINI_APP_NEKOCAT_ROLE_ID },
   { value: 'mini_app_burrow_bash',         label: 'Burrow Bash',           roleId: MINI_APP_BURROW_BASH_ROLE_ID },
-  { value: 'mini_app_cool_cats',           label: 'Cool Cats',             roleId: MINI_APP_COOL_CATS_ROLE_ID }
+  { value: 'mini_app_cool_cats',           label: 'Cool Cats',             roleId: MINI_APP_COOL_CATS_ROLE_ID },
+  { value: 'mini_app_yoki_arcade',         label: 'Yoki Arcade',           roleId: MINI_APP_YOKI_ARCADE_ROLE_ID },
+  { value: 'mini_app_claw_machine',        label: 'Claw Machine/Force Flip', roleId: MINI_APP_CLAW_MACHINE_ROLE_ID }
 ];
 
 async function sendMiniAppSelectMenu(channel) {
