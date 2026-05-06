@@ -38,7 +38,8 @@ const {
   MINI_APP_BURROW_BASH_ROLE_ID = '1483850354591400067',
   MINI_APP_COOL_CATS_ROLE_ID = '1489106591667060736',
   MINI_APP_YOKI_ARCADE_ROLE_ID = '1501218559760793660',
-  MINI_APP_CLAW_MACHINE_ROLE_ID = '1496550892160155929'
+  MINI_APP_CLAW_MACHINE_ROLE_ID = '1496550892160155929',
+  MINI_APP_TAPTAP_ROLE_ID = '1501471650368061552'
 } = process.env;
 
 if (!DISCORD_TOKEN) {
@@ -821,7 +822,8 @@ const MINI_APP_ROLE_MAP = [
   { value: 'mini_app_burrow_bash',         label: 'Burrow Bash',           roleId: MINI_APP_BURROW_BASH_ROLE_ID },
   { value: 'mini_app_cool_cats',           label: 'Cool Cats',             roleId: MINI_APP_COOL_CATS_ROLE_ID },
   { value: 'mini_app_yoki_arcade',         label: 'Yoki Arcade',           roleId: MINI_APP_YOKI_ARCADE_ROLE_ID },
-  { value: 'mini_app_claw_machine',        label: 'Claw Machine/Force Flip', roleId: MINI_APP_CLAW_MACHINE_ROLE_ID }
+  { value: 'mini_app_claw_machine',        label: 'Claw Machine/Force Flip', roleId: MINI_APP_CLAW_MACHINE_ROLE_ID },
+  { value: 'mini_app_taptap',             label: 'TapTap',                roleId: MINI_APP_TAPTAP_ROLE_ID }
 ];
 
 async function sendMiniAppSelectMenu(channel) {
