@@ -84,7 +84,7 @@ const FAQ_ITEMS = [
   {
     id: 'faq_2',
     question: 'How many STAR Points can I earn for providing liquidity?',
-    answer: 'You earn 1 STAR Point per day for every $100 worth of liquidity provided.'
+    answer: 'You need to provide at least **$10** worth of USDSC per position to earn STAR Points. Points begin accumulating after a **30-day cliff period**, and are calculated daily based on your position size and holding duration.\n\n**Rate:** 0.1 STAR Points per $10 USDSC deposited per day.\n\nMultipliers are applied based on how long you hold your position:\n• Day 1–29: **0×** (cliff period, no points yet)\n• Day 30–59: **1×**\n• Day 60–89: **1.2×**\n• Day 90–119: **1.4×**\n• Day 120–149: **1.6×**\n• Day 150–179: **1.8×**\n• Day 180+: **2.0×**\n\nMultipliers are distributed every 30 days based on the number of days your funds are held.'
   },
   {
     id: 'faq_2b',
@@ -841,7 +841,7 @@ const MINI_APP_ROLE_MAP = [
   { value: 'mini_app_pocket_knights',      label: 'Pocket Knights',        roleId: MINI_APP_POCKET_KNIGHTS_ROLE_ID },
   { value: 'mini_app_world_of_trinity',    label: 'World of Trinity',      roleId: MINI_APP_WORLD_OF_TRINITY_ROLE_ID },
   { value: 'mini_app_dice_or_die',         label: 'Dice or Die',           roleId: MINI_APP_DICE_OR_DIE_ROLE_ID },
-  { value: 'mini_app_heroes',              label: 'Heroes of Hecanos',    roleId: MINI_APP_HEROES_ROLE_ID },
+  { value: 'mini_app_heroes',             label: 'Heroes of Hecanos',     roleId: MINI_APP_HEROES_ROLE_ID },
   { value: 'mini_app_clash_horse',         label: 'Clash Horse',           roleId: MINI_APP_CLASH_HORSE_ROLE_ID },
   { value: 'mini_app_nekocat',             label: 'Nekocat/CardWars',      roleId: MINI_APP_NEKOCAT_ROLE_ID },
   { value: 'mini_app_burrow_bash',         label: 'Burrow Bash',           roleId: MINI_APP_BURROW_BASH_ROLE_ID },
