@@ -77,14 +77,29 @@ const FAQ_ITEMS = [
     answer: 'You can earn STAR Points by providing liquidity and by reaching 10 daily GMs.'
   },
   {
+    id: 'faq_1b',
+    question: 'How do I earn STAR Points by providing liquidity?',
+    answer: '1. Own at least **$10** worth of USDSC. You can swap USDC.e or ETH for USDSC at https://app.startale.com/swap.\n2. Sign in and go to https://app.startale.com/provide-liquidity.\n3. Click **Deposit**.\n4. Enter your USDSC amount and press **Add Liquidity**.\n5. You\'ll see a confirmation page — STAR Points begin accumulating after 30 days.'
+  },
+  {
     id: 'faq_2',
     question: 'How many STAR Points can I earn for providing liquidity?',
     answer: 'You earn 1 STAR Point per day for every $100 worth of liquidity provided.'
   },
   {
+    id: 'faq_2b',
+    question: 'How many times can I provide liquidity?',
+    answer: 'You can create as many liquidity positions as you like. Each individual deposit must be at least **$10** worth of USDSC to earn STAR Points.'
+  },
+  {
     id: 'faq_3',
     question: 'What is the minimum liquidity required to earn STAR Points?',
-    answer: 'The minimum required is $50, which earns 0.5 STAR Points per day.'
+    answer: 'The minimum required is $10 worth of USDSC per position to earn STAR Points.'
+  },
+  {
+    id: 'faq_3b',
+    question: 'What is the minimum required, and where can I see my STAR Points?',
+    answer: 'Each position must be at least **$10** worth of USDSC to earn STAR Points.\n\nYou can view your STAR Points under **"Provide Liquidity"** in the Startale App.'
   },
   {
     id: 'faq_4',
@@ -94,7 +109,7 @@ const FAQ_ITEMS = [
   {
     id: 'faq_5',
     question: 'Is there a difference between the Earn Vault and providing liquidity?',
-    answer: 'Yes.\n• **Earn Vault** deposits earn an APY paid in USDC.\n• **Providing liquidity** (minimum $50) earns STAR Points.'
+    answer: 'Yes.\n• **Earn Vault** deposits earn an APY paid in USDC.\n• **Providing liquidity** (minimum $10) earns STAR Points.'
   },
   {
     id: 'faq_6',
@@ -104,7 +119,7 @@ const FAQ_ITEMS = [
   {
     id: 'faq_7',
     question: 'When do STAR Points appear on my profile?',
-    answer: 'STAR Points appear after 30 days from the point you provided a minimum of $50 worth in liquidity.'
+    answer: 'STAR Points begin accumulating after a **30-day cliff period** from the date you provided liquidity.'
   },
   {
     id: 'faq_8',
@@ -117,9 +132,19 @@ const FAQ_ITEMS = [
     answer: 'Each deposit is tracked independently.\n• A $50 deposit on January 1 earns 0.5 STAR Points after 30 days.\n• A $100 deposit on January 5 earns 1 STAR Point after its own 30-day period.'
   },
   {
+    id: 'faq_9b',
+    question: 'How are my STAR Points calculated?',
+    answer: 'Points begin after a **30-day cliff period**. Rate: **0.1 STAR Points per $10 USDSC/day**. Multipliers apply based on holding duration, distributed every 30 days.\n\n**Scenario #1**\n> Alicia deposits **$500** on Jan 1.\n> • Jan 1–29: No points (cliff period)\n> • From Jan 30: **5 pts/day**\n> • After 60 days: ×1.2 boost → **6 pts/day**\n> • After 180 days: ×2.0 boost → **10 pts/day**\n\n**Scenario #2**\n> Jerad deposits **$300** on Jan 1 (Position 1) and **$300** on Mar 1 (Position 2).\n> • Jan 1–29: No points\n> • From Jan 30: **3 pts/day** on Position 1\n> • From Mar 30: **+3 pts/day** on Position 2'
+  },
+  {
     id: 'faq_10',
     question: 'Can I choose which liquidity position to withdraw?',
     answer: 'No. Withdrawals follow a Last-In, First-Out (LIFO) method. This helps preserve older positions that may carry higher multipliers.'
+  },
+  {
+    id: 'faq_10b',
+    question: 'What happens when I withdraw liquidity?',
+    answer: 'Withdrawals follow **Last-In-First-Out (LIFO)** — your newest positions are withdrawn first, preserving older positions with higher multipliers.\n\n**Scenario**\n> Carlos has 4 positions: 30 Apr, 30 Jul, 30 Sep, and 31 Oct ($210).\n> On Nov 2, he withdraws **$200**.\n> → The **31 Oct position** is drawn from first, leaving $10 remaining.\n> His older positions remain untouched and multipliers are preserved.'
   },
   {
     id: 'faq_11',
