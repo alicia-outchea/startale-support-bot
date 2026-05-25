@@ -39,7 +39,9 @@ const {
   MINI_APP_COOL_CATS_ROLE_ID = '1489106591667060736',
   MINI_APP_YOKI_ARCADE_ROLE_ID = '1501218559760793660',
   MINI_APP_CLAW_MACHINE_ROLE_ID = '1496550892160155929',
-  MINI_APP_TAPTAP_ROLE_ID = '1501471650368061552'
+  MINI_APP_TAPTAP_ROLE_ID = '1501471650368061552',
+  MINI_APP_CONFNT_ROLE_ID = '1508318182899974194',
+  MINI_APP_HUMAN_TAP_ROLE_ID = '1508320748996137050'
 } = process.env;
 
 if (!DISCORD_TOKEN) {
@@ -832,23 +834,25 @@ const MINI_APP_SELECT_ID = 'mini_app_select';
 const MINI_APP_TICKET_CHANNEL_ID = '1483833764160475207';
 const GENERAL_TICKET_CHANNEL_ID = '1425558708943061132';
 const MINI_APP_ROLE_MAP = [
-  { value: 'mini_app_el_hexa',            label: 'El Hexa',                roleId: MINI_APP_EL_HEXA_ROLE_ID },
-  { value: 'mini_app_morning_moon_pocket', label: 'Morning Moon Pocket',   roleId: MINI_APP_MORNING_MOON_POCKET_ROLE_ID },
-  { value: 'mini_app_morning_farm',        label: 'Morning Farm',          roleId: MINI_APP_MORNING_FARM_ROLE_ID },
-  { value: 'mini_app_packflip',            label: 'Packflip',              roleId: MINI_APP_PACKFLIP_ROLE_ID },
-  { value: 'mini_app_pnyx',               label: 'PNYX/Press A/PIKIT',    roleId: MINI_APP_PNYX_ROLE_ID },
-  { value: 'mini_app_awakening',           label: 'Awakening of Guardians', roleId: MINI_APP_AWAKENING_ROLE_ID },
-  { value: 'mini_app_pocket_knights',      label: 'Pocket Knights',        roleId: MINI_APP_POCKET_KNIGHTS_ROLE_ID },
-  { value: 'mini_app_world_of_trinity',    label: 'World of Trinity',      roleId: MINI_APP_WORLD_OF_TRINITY_ROLE_ID },
-  { value: 'mini_app_dice_or_die',         label: 'Dice or Die',           roleId: MINI_APP_DICE_OR_DIE_ROLE_ID },
-  { value: 'mini_app_heroes',             label: 'Heroes of Hecanos',     roleId: MINI_APP_HEROES_ROLE_ID },
-  { value: 'mini_app_clash_horse',         label: 'Clash Horse',           roleId: MINI_APP_CLASH_HORSE_ROLE_ID },
-  { value: 'mini_app_nekocat',             label: 'Nekocat/CardWars',      roleId: MINI_APP_NEKOCAT_ROLE_ID },
-  { value: 'mini_app_burrow_bash',         label: 'Burrow Bash',           roleId: MINI_APP_BURROW_BASH_ROLE_ID },
-  { value: 'mini_app_cool_cats',           label: 'Cool Cats',             roleId: MINI_APP_COOL_CATS_ROLE_ID },
-  { value: 'mini_app_yoki_arcade',         label: 'Yoki Arcade',           roleId: MINI_APP_YOKI_ARCADE_ROLE_ID },
+  { value: 'mini_app_awakening',           label: 'Awakening of Guardians',  roleId: MINI_APP_AWAKENING_ROLE_ID },
+  { value: 'mini_app_burrow_bash',         label: 'Burrow Bash',             roleId: MINI_APP_BURROW_BASH_ROLE_ID },
+  { value: 'mini_app_clash_horse',         label: 'Clash Horse',             roleId: MINI_APP_CLASH_HORSE_ROLE_ID },
   { value: 'mini_app_claw_machine',        label: 'Claw Machine/Force Flip', roleId: MINI_APP_CLAW_MACHINE_ROLE_ID },
-  { value: 'mini_app_taptap',             label: 'TapTap',                roleId: MINI_APP_TAPTAP_ROLE_ID }
+  { value: 'mini_app_confnt',             label: 'coNFT',                   roleId: MINI_APP_CONFNT_ROLE_ID },
+  { value: 'mini_app_cool_cats',           label: 'Cool Cats',               roleId: MINI_APP_COOL_CATS_ROLE_ID },
+  { value: 'mini_app_dice_or_die',         label: 'Dice or Die',             roleId: MINI_APP_DICE_OR_DIE_ROLE_ID },
+  { value: 'mini_app_el_hexa',            label: 'El Hexa',                 roleId: MINI_APP_EL_HEXA_ROLE_ID },
+  { value: 'mini_app_heroes',             label: 'Heroes of Hecanos',       roleId: MINI_APP_HEROES_ROLE_ID },
+  { value: 'mini_app_human_tap',           label: 'Human Tap',               roleId: MINI_APP_HUMAN_TAP_ROLE_ID },
+  { value: 'mini_app_morning_farm',        label: 'Morning Farm',            roleId: MINI_APP_MORNING_FARM_ROLE_ID },
+  { value: 'mini_app_morning_moon_pocket', label: 'Morning Moon Pocket',     roleId: MINI_APP_MORNING_MOON_POCKET_ROLE_ID },
+  { value: 'mini_app_nekocat',             label: 'Nekocat/CardWars',        roleId: MINI_APP_NEKOCAT_ROLE_ID },
+  { value: 'mini_app_packflip',            label: 'Packflip',                roleId: MINI_APP_PACKFLIP_ROLE_ID },
+  { value: 'mini_app_pocket_knights',      label: 'Pocket Knights',          roleId: MINI_APP_POCKET_KNIGHTS_ROLE_ID },
+  { value: 'mini_app_pnyx',               label: 'PNYX/Press A/PIKIT',      roleId: MINI_APP_PNYX_ROLE_ID },
+  { value: 'mini_app_taptap',             label: 'TapTap',                  roleId: MINI_APP_TAPTAP_ROLE_ID },
+  { value: 'mini_app_world_of_trinity',    label: 'World of Trinity',        roleId: MINI_APP_WORLD_OF_TRINITY_ROLE_ID },
+  { value: 'mini_app_yoki_arcade',         label: 'Yoki Arcade',             roleId: MINI_APP_YOKI_ARCADE_ROLE_ID }
 ];
 
 async function sendMiniAppSelectMenu(channel) {
