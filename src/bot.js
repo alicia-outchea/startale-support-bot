@@ -16,7 +16,6 @@ const {
   SUPPORT_ROLE_ID,
   TICKET_CHANNEL_PREFIX = 'ticket-',
   DEBUG_AUTOREPLY = 'false',
-  SUPPORT_STAFF_IDS = '',
   MINI_APP_EL_HEXA_ROLE_ID = '1483709405806727293',
   MINI_APP_MORNING_MOON_POCKET_ROLE_ID = '1483717804757614622',
   MINI_APP_MORNING_FARM_ROLE_ID = '1483718067870498837',
@@ -35,7 +34,11 @@ const {
   MINI_APP_CLAW_MACHINE_ROLE_ID = '1496550892160155929',
   MINI_APP_TAPTAP_ROLE_ID = '1501471650368061552',
   MINI_APP_CONFNT_ROLE_ID = '1508318182899974194',
-  MINI_APP_HUMAN_TAP_ROLE_ID = '1508320748996137050'
+  MINI_APP_HUMAN_TAP_ROLE_ID = '1508320748996137050',
+  MINI_APP_CRYPTOFILLS_ROLE_ID = '1531608307956060210',
+  MINI_APP_SQUADLETICS_ROLE_ID = '1531608234387836950',
+  MINI_APP_SUPERCASH_ROLE_ID = '1531608130818146335',
+  MINI_APP_SPACE_RUNNER_ROLE_ID = '1531607968741720217'
 } = process.env;
 
 if (!DISCORD_TOKEN) {
@@ -54,14 +57,6 @@ if (
 }
 
 const debugAutoReply = DEBUG_AUTOREPLY.toLowerCase() === 'true';
-
-const AUTO_REPLY_EXCLUDED_USER_IDS = new Set(
-  SUPPORT_STAFF_IDS
-    ? SUPPORT_STAFF_IDS.split(',').map(id => id.trim()).filter(Boolean)
-    : []
-);
-
-const DELETE_AUTO_REPLY_COMMAND_NAME = 'deletebotreply';
 
 const client = new Client({
   intents: [
@@ -109,56 +104,33 @@ client.once(Events.ClientReady, (readyClient) => {
   console.log(`로그인 성공: ${readyClient.user.tag}`);
 });
 
-client.once(Events.ClientReady, async () => {
-  const commands = [
-    {
-      name: DELETE_AUTO_REPLY_COMMAND_NAME,
-      description: 'Delete the latest bot message in this channel.'
-    }
-  ];
-
-  try {
-    const hasValidGuildId = GUILD_ID && /^\d{17,20}$/.test(GUILD_ID);
-    if (hasValidGuildId) {
-      const guild = await client.guilds.fetch(GUILD_ID);
-      await guild.commands.set(commands);
-      await client.application.commands.set([]);
-      console.log(`길드 전용 슬래시 명령어 등록 완료`);
-    } else {
-      if (GUILD_ID) {
-        console.warn('GUILD_ID 형식이 잘못되어 글로벌 명령어로 등록합니다. (.env 확인 필요)');
-      }
-      await client.application.commands.set(commands);
-      console.log(`글로벌 슬래시 명령어 등록 완료 (전파에 시간이 걸릴 수 있음)`);
-    }
-  } catch (error) {
-    console.error('슬래시 명령어 등록 실패:', error);
-  }
-});
-
 const MINI_APP_SELECT_ID = 'mini_app_select';
 const MINI_APP_TICKET_CHANNEL_ID = '1483833764160475207';
 const GENERAL_TICKET_CHANNEL_ID = '1425558708943061132';
 const MINI_APP_ROLE_MAP = [
+  { value: 'mini_app_claw_machine',        label: 'AI Footballer/Claw Machine/Force Flip',    roleId: MINI_APP_CLAW_MACHINE_ROLE_ID },
   { value: 'mini_app_awakening',           label: 'Awakening of Guardians/Zombie Idle Defence', roleId: MINI_APP_AWAKENING_ROLE_ID },
-  { value: 'mini_app_burrow_bash',         label: 'Burrow Bash',             roleId: MINI_APP_BURROW_BASH_ROLE_ID },
-  { value: 'mini_app_clash_horse',         label: 'Clash Horse',             roleId: MINI_APP_CLASH_HORSE_ROLE_ID },
-  { value: 'mini_app_claw_machine',        label: 'AI Footballer/Claw Machine/Force Flip', roleId: MINI_APP_CLAW_MACHINE_ROLE_ID },
-  { value: 'mini_app_confnt',             label: 'coNFT',                   roleId: MINI_APP_CONFNT_ROLE_ID },
-  { value: 'mini_app_cool_cats',           label: 'Cool Cats',               roleId: MINI_APP_COOL_CATS_ROLE_ID },
-  { value: 'mini_app_dice_or_die',         label: 'Dice or Die',             roleId: MINI_APP_DICE_OR_DIE_ROLE_ID },
-  { value: 'mini_app_el_hexa',            label: 'El Hexa',                 roleId: MINI_APP_EL_HEXA_ROLE_ID },
-  { value: 'mini_app_heroes',             label: 'Heroes of Hecanos',       roleId: MINI_APP_HEROES_ROLE_ID },
-  { value: 'mini_app_human_tap',           label: 'Human Tap',               roleId: MINI_APP_HUMAN_TAP_ROLE_ID },
-  { value: 'mini_app_morning_farm',        label: 'Morning Farm',            roleId: MINI_APP_MORNING_FARM_ROLE_ID },
-  { value: 'mini_app_morning_moon_pocket', label: 'Morning Moon Pocket',     roleId: MINI_APP_MORNING_MOON_POCKET_ROLE_ID },
-  { value: 'mini_app_nekocat',             label: 'Fantasy Team/NekoCat/CardWars/LasMeta', roleId: MINI_APP_NEKOCAT_ROLE_ID },
-  { value: 'mini_app_packflip',            label: 'Packflip',                roleId: MINI_APP_PACKFLIP_ROLE_ID },
-  { value: 'mini_app_pocket_knights',      label: 'Pocket Knights',          roleId: MINI_APP_POCKET_KNIGHTS_ROLE_ID },
-  { value: 'mini_app_pnyx',               label: 'PNYX/Press A/PIKIT',      roleId: MINI_APP_PNYX_ROLE_ID },
-  { value: 'mini_app_taptap',             label: 'TapTap',                  roleId: MINI_APP_TAPTAP_ROLE_ID },
-  { value: 'mini_app_world_of_trinity',    label: 'World of Trinity',        roleId: MINI_APP_WORLD_OF_TRINITY_ROLE_ID },
-  { value: 'mini_app_yoki_arcade',         label: 'Yoki Arcade',             roleId: MINI_APP_YOKI_ARCADE_ROLE_ID }
+  { value: 'mini_app_burrow_bash',         label: 'Burrow Bash',                              roleId: MINI_APP_BURROW_BASH_ROLE_ID },
+  { value: 'mini_app_clash_horse',         label: 'Clash Horse',                              roleId: MINI_APP_CLASH_HORSE_ROLE_ID },
+  { value: 'mini_app_confnt',             label: 'coNFT',                                    roleId: MINI_APP_CONFNT_ROLE_ID },
+  { value: 'mini_app_cool_cats',           label: 'Cool Cats',                                roleId: MINI_APP_COOL_CATS_ROLE_ID },
+  { value: 'mini_app_cryptofills',         label: 'Cryptofills',                              roleId: MINI_APP_CRYPTOFILLS_ROLE_ID },
+  { value: 'mini_app_dice_or_die',         label: 'Dice or Die',                              roleId: MINI_APP_DICE_OR_DIE_ROLE_ID },
+  { value: 'mini_app_el_hexa',            label: 'El Hexa',                                  roleId: MINI_APP_EL_HEXA_ROLE_ID },
+  { value: 'mini_app_nekocat',             label: 'Fantasy Team/NekoCat/CardWars/LasMeta',    roleId: MINI_APP_NEKOCAT_ROLE_ID },
+  { value: 'mini_app_heroes',             label: 'Heroes of Hecanos',                        roleId: MINI_APP_HEROES_ROLE_ID },
+  { value: 'mini_app_human_tap',           label: 'Human Tap',                                roleId: MINI_APP_HUMAN_TAP_ROLE_ID },
+  { value: 'mini_app_morning_farm',        label: 'Morning Farm',                             roleId: MINI_APP_MORNING_FARM_ROLE_ID },
+  { value: 'mini_app_morning_moon_pocket', label: 'Morning Moon Pocket',                      roleId: MINI_APP_MORNING_MOON_POCKET_ROLE_ID },
+  { value: 'mini_app_packflip',            label: 'Packflip',                                 roleId: MINI_APP_PACKFLIP_ROLE_ID },
+  { value: 'mini_app_pnyx',               label: 'PNYX/Press A/PIKIT',                       roleId: MINI_APP_PNYX_ROLE_ID },
+  { value: 'mini_app_pocket_knights',      label: 'Pocket Knights',                           roleId: MINI_APP_POCKET_KNIGHTS_ROLE_ID },
+  { value: 'mini_app_space_runner',        label: 'Space Runner/Penalty Game',                roleId: MINI_APP_SPACE_RUNNER_ROLE_ID },
+  { value: 'mini_app_squadletics',         label: 'Squadletics',                              roleId: MINI_APP_SQUADLETICS_ROLE_ID },
+  { value: 'mini_app_supercash',           label: 'SuperCash',                                roleId: MINI_APP_SUPERCASH_ROLE_ID },
+  { value: 'mini_app_taptap',             label: 'TapTap',                                   roleId: MINI_APP_TAPTAP_ROLE_ID },
+  { value: 'mini_app_world_of_trinity',    label: 'World of Trinity',                         roleId: MINI_APP_WORLD_OF_TRINITY_ROLE_ID },
+  { value: 'mini_app_yoki_arcade',         label: 'Yoki Arcade',                              roleId: MINI_APP_YOKI_ARCADE_ROLE_ID }
 ];
 
 async function sendMiniAppSelectMenu(channel) {
@@ -188,81 +160,48 @@ async function sendMiniAppSelectMenu(channel) {
 }
 
 client.on(Events.InteractionCreate, async (interaction) => {
-  if (interaction.isChatInputCommand()) {
-    if (!interaction.inGuild()) return;
+  if (!interaction.isStringSelectMenu()) return;
+  if (!interaction.inGuild()) return;
+  if (interaction.customId !== MINI_APP_SELECT_ID) return;
 
-    if (interaction.commandName === DELETE_AUTO_REPLY_COMMAND_NAME) {
-      if (!AUTO_REPLY_EXCLUDED_USER_IDS.has(interaction.user.id)) {
-        await interaction.reply({ content: 'Only designated support members can use this command.', ephemeral: true });
-        return;
-      }
+  const selected = interaction.values[0];
 
-      const channel = interaction.channel;
-      if (!channel || !channel.isTextBased()) {
-        await interaction.reply({ content: 'This command can only be used inside a ticket channel.', ephemeral: true });
-        return;
-      }
+  const disabledRow = new ActionRowBuilder().addComponents(
+    new StringSelectMenuBuilder()
+      .setCustomId(MINI_APP_SELECT_ID)
+      .setPlaceholder('Selection recorded.')
+      .setDisabled(true)
+      .addOptions(
+        new StringSelectMenuOptionBuilder().setLabel('Selection recorded.').setValue('_placeholder')
+      )
+  );
+  await interaction.update({ components: [disabledRow] });
 
-      const messages = await channel.messages.fetch({ limit: 50 });
-      const latestBotReply = messages.find((msg) => msg.author.id === client.user.id);
-      if (!latestBotReply) {
-        await interaction.reply({ content: 'No bot message found to delete.', ephemeral: true });
-        return;
-      }
-
-      await latestBotReply.delete();
-      await interaction.reply({ content: 'Deleted the latest bot message.', ephemeral: true });
-      return;
-    }
+  if (selected === 'noa_mini_app') {
+    await interaction.channel.send(`For Startale App issues, please open a ticket here! <#${GENERAL_TICKET_CHANNEL_ID}>`);
+    debugLog('Mini App select: noa_mini_app selected in channel', interaction.channel.id);
+    return;
   }
 
-  if (interaction.isStringSelectMenu() && interaction.inGuild() && interaction.customId === MINI_APP_SELECT_ID) {
-    const selected = interaction.values[0];
-
-    const disabledRow = new ActionRowBuilder().addComponents(
-      new StringSelectMenuBuilder()
-        .setCustomId(MINI_APP_SELECT_ID)
-        .setPlaceholder('Selection recorded.')
-        .setDisabled(true)
-        .addOptions(
-          new StringSelectMenuOptionBuilder().setLabel('Selection recorded.').setValue('_placeholder')
-        )
-    );
-    await interaction.update({ components: [disabledRow] });
-
-    if (selected === 'noa_mini_app') {
-      await interaction.channel.send(`For Startale App issues, please open a ticket here! <#${GENERAL_TICKET_CHANNEL_ID}>`);
-      debugLog('Mini App select: noa_mini_app selected in channel', interaction.channel.id);
-      return;
-    }
-
-    if (selected === 'mini_app_none') {
-      await interaction.channel.send('No Mini App developer assigned to this ticket.');
-      debugLog('Mini App select: none selected in channel', interaction.channel.id);
-      return;
-    }
-
-    const match = MINI_APP_ROLE_MAP.find((r) => r.value === selected);
-    if (match) {
-      await interaction.channel.send(`This ticket has been tagged: **${match.label}**\n<@&${match.roleId}>`);
-      if (interaction.channel.isThread()) {
-        try {
-          await interaction.guild.members.fetch();
-          const role = await interaction.guild.roles.fetch(match.roleId);
-          if (role) {
-            await Promise.all(
-              role.members.map((m) =>
-                interaction.channel.members.add(m.id).catch((e) => console.error(`Failed to add ${m.id} to thread:`, e))
-              )
-            );
-            debugLog('Added', role.members.size, 'role members to thread', interaction.channel.id);
-          }
-        } catch (err) {
-          console.error('Failed to add role members to thread:', err);
+  const match = MINI_APP_ROLE_MAP.find((r) => r.value === selected);
+  if (match) {
+    await interaction.channel.send(`This ticket has been tagged: **${match.label}**\n<@&${match.roleId}>`);
+    if (interaction.channel.isThread()) {
+      try {
+        await interaction.guild.members.fetch();
+        const role = await interaction.guild.roles.fetch(match.roleId);
+        if (role) {
+          await Promise.all(
+            role.members.map((m) =>
+              interaction.channel.members.add(m.id).catch((e) => console.error(`Failed to add ${m.id} to thread:`, e))
+            )
+          );
+          debugLog('Added', role.members.size, 'role members to thread', interaction.channel.id);
         }
+      } catch (err) {
+        console.error('Failed to add role members to thread:', err);
       }
     }
-    return;
   }
 });
 
