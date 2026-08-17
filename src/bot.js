@@ -38,7 +38,8 @@ const {
   MINI_APP_CRYPTOFILLS_ROLE_ID = '1531608307956060210',
   MINI_APP_SQUADLETICS_ROLE_ID = '1531608234387836950',
   MINI_APP_SUPERCASH_ROLE_ID = '1531608130818146335',
-  MINI_APP_SPACE_RUNNER_ROLE_ID = '1531607968741720217'
+  MINI_APP_SPACE_RUNNER_ROLE_ID = '1531607968741720217',
+  MINI_APP_WEAD_ROLE_ID = '1538875553841414164'
 } = process.env;
 
 if (!DISCORD_TOKEN) {
@@ -129,6 +130,7 @@ const MINI_APP_ROLE_MAP = [
   { value: 'mini_app_squadletics',         label: 'Squadletics',                              roleId: MINI_APP_SQUADLETICS_ROLE_ID },
   { value: 'mini_app_supercash',           label: 'SuperCash',                                roleId: MINI_APP_SUPERCASH_ROLE_ID },
   { value: 'mini_app_taptap',             label: 'TapTap',                                   roleId: MINI_APP_TAPTAP_ROLE_ID },
+  { value: 'mini_app_wead',               label: 'WeAd/Gonana Farms/SEOAI',                  roleId: MINI_APP_WEAD_ROLE_ID },
   { value: 'mini_app_world_of_trinity',    label: 'World of Trinity',                         roleId: MINI_APP_WORLD_OF_TRINITY_ROLE_ID },
   { value: 'mini_app_yoki_arcade',         label: 'Yoki Arcade',                              roleId: MINI_APP_YOKI_ARCADE_ROLE_ID }
 ];
